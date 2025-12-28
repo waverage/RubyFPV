@@ -44,7 +44,7 @@ LDFLAGS_CENTRAL2 := -lpthread -lrt -lm
 LDFLAGS_RENDERER := -ldrm -lcairo
 CFLAGS_RENDERER := -I/usr/include/drm -I/usr/include/libdrm
 CFLAGS_RENDERER += `pkg-config cairo --cflags`
-_LDFLAGS := $(LDFLAGS) -lrt -lpcap -lpthread -li2c -lgpiod -Wl,--gc-sections 
+_LDFLAGS := $(LDFLAGS) -lrt -lpcap -lpthread -li2c -lgpiod -lwiringPi -Wl,--gc-sections 
 _CFLAGS := $(_CFLAGS) -DRUBY_BUILD_HW_PLATFORM_PI
 _CPPFLAGS := $(_CPPFLAGS) -DRUBY_BUILD_HW_PLATFORM_PI
 
