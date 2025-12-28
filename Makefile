@@ -51,7 +51,7 @@ _CPPFLAGS := $(_CPPFLAGS) -DRUBY_BUILD_HW_PLATFORM_PI
 _CPPFLAGS_NOSDL := $(_CPPFLAGS)
 _LDFLAGS_NOSDL := $(_LDFLAGS)
 _CPPFLAGS := $(_CPPFLAGS) -I/usr/include/SDL2 -D_GNU_SOURCE=1 -D_REENTRANT
-_LDFLAGS := $(_LDFLAGS) -L/usr/lib/arm-linux-gnueabihf -lSDL2
+_LDFLAGS := $(_LDFLAGS) -L/usr/lib/aarch64-linux-gnu -lSDL2
 
 CENTRAL_RENDER_CODE := $(FOLDER_CENTRAL_RENDERER)/render_engine.o $(FOLDER_CENTRAL_RENDERER)/render_engine_cairo.o $(FOLDER_CENTRAL_RENDERER)/render_engine_ui.o $(FOLDER_CENTRAL_RENDERER)/drm_core.o
 MODULE_LOC := $(FOLDER_COMMON)/strings_loc.o $(FOLDER_COMMON)/strings_table.o 

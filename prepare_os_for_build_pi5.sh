@@ -9,3 +9,6 @@ sudo apt purge wiringpi -y
 git clone https://github.com/WiringPi/WiringPi.git
 cd WiringPi
 ./build
+
+
+sudo apt install libsdl2-dev -y
