@@ -34,12 +34,12 @@
 #include "../base/config_hw.h"
 #include <math.h>
 
-#if defined (HW_PLATFORM_RASPBERRY)
+#if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
 //#include "render_engine_ovg.h"
 #include "render_engine_raw.h"
 #endif
 
-#if defined (HW_PLATFORM_RADXA)
+#if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
 #include "render_engine_cairo.h"
 #endif
 
