@@ -1,4 +1,4 @@
-# run: make all RUBY_BUILD_ENV=openipc/radxa/[empty](pi)
+# run: make all RUBY_BUILD_ENV=openipc/radxa/pi5/[empty](pi)
 _CFLAGS := $(CFLAGS) -Wall -Wno-stringop-truncation -Wno-format-truncation -O2 -fdata-sections -ffunction-sections
 _CPPFLAGS := $(CPPLAGS) -Wall -Wno-stringop-truncation -Wno-format-truncation -O2 -fdata-sections -ffunction-sections
 
@@ -36,6 +36,26 @@ _LDFLAGS := $(_LDFLAGS) -L/usr/lib/arm-linux-gnueabihf -lSDL2
 CENTRAL_RENDER_CODE := $(FOLDER_CENTRAL_RENDERER)/render_engine.o $(FOLDER_CENTRAL_RENDERER)/render_engine_cairo.o $(FOLDER_CENTRAL_RENDERER)/render_engine_ui.o $(FOLDER_CENTRAL_RENDERER)/drm_core.o
 MODULE_LOC := $(FOLDER_COMMON)/strings_loc.o $(FOLDER_COMMON)/strings_table.o 
 else
+ifeq ($(RUBY_BUILD_ENV),pi)
+
+LDFLAGS_CENTRAL := -L/lib/aarch64-linux-gnu -lpthread -lrt -lm
+LDFLAGS_CENTRAL2 := -lpthread -lrt -lm
+
+LDFLAGS_RENDERER := -ldrm -lcairo
+CFLAGS_RENDERER := -I/usr/include/drm -I/usr/include/libdrm
+CFLAGS_RENDERER += `pkg-config cairo --cflags`
+_LDFLAGS := $(LDFLAGS) -lrt -lpcap -lpthread -li2c -lgpiod -Wl,--gc-sections 
+_CFLAGS := $(_CFLAGS) -DRUBY_BUILD_HW_PLATFORM_PI
+_CPPFLAGS := $(_CPPFLAGS) -DRUBY_BUILD_HW_PLATFORM_PI
+
+_CPPFLAGS_NOSDL := $(_CPPFLAGS)
+_LDFLAGS_NOSDL := $(_LDFLAGS)
+_CPPFLAGS := $(_CPPFLAGS) -I/usr/include/SDL2 -D_GNU_SOURCE=1 -D_REENTRANT
+_LDFLAGS := $(_LDFLAGS) -L/usr/lib/arm-linux-gnueabihf -lSDL2
+
+CENTRAL_RENDER_CODE := $(FOLDER_CENTRAL_RENDERER)/render_engine.o $(FOLDER_CENTRAL_RENDERER)/render_engine_cairo.o $(FOLDER_CENTRAL_RENDERER)/render_engine_ui.o $(FOLDER_CENTRAL_RENDERER)/drm_core.o
+MODULE_LOC := $(FOLDER_COMMON)/strings_loc.o $(FOLDER_COMMON)/strings_table.o 
+else
 
 LDFLAGS_CENTRAL := -L/usr/lib/arm-linux-gnueabihf -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lm
 LDFLAGS_CENTRAL2 := -L/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lpthread -lrt -lm -lopenmaxil -lbcm_host -lvcos -lvchiq_arm -lmmal  -lmmal_core -lmmal_util -lmmal_vc_client  
@@ -51,6 +71,7 @@ _LDFLAGS_NOSDL := $(_LDFLAGS)
 
 CENTRAL_RENDER_CODE := $(FOLDER_CENTRAL_RENDERER)/lodepng.o $(FOLDER_CENTRAL_RENDERER)/nanojpeg.o $(FOLDER_CENTRAL_RENDERER)/fbgraphics.o $(FOLDER_CENTRAL_RENDERER)/render_engine.o $(FOLDER_CENTRAL_RENDERER)/render_engine_raw.o $(FOLDER_CENTRAL_RENDERER)/render_engine_ui.o $(FOLDER_CENTRAL_RENDERER)/fbg_dispmanx.o
 
+endif
 endif
 endif
 
