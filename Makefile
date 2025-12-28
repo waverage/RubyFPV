@@ -36,7 +36,7 @@ _LDFLAGS := $(_LDFLAGS) -L/usr/lib/arm-linux-gnueabihf -lSDL2
 CENTRAL_RENDER_CODE := $(FOLDER_CENTRAL_RENDERER)/render_engine.o $(FOLDER_CENTRAL_RENDERER)/render_engine_cairo.o $(FOLDER_CENTRAL_RENDERER)/render_engine_ui.o $(FOLDER_CENTRAL_RENDERER)/drm_core.o
 MODULE_LOC := $(FOLDER_COMMON)/strings_loc.o $(FOLDER_COMMON)/strings_table.o 
 else
-ifeq ($(RUBY_BUILD_ENV),pi)
+ifeq ($(RUBY_BUILD_ENV),pi5)
 
 LDFLAGS_CENTRAL := -L/lib/aarch64-linux-gnu -lpthread -lrt -lm
 LDFLAGS_CENTRAL2 := -lpthread -lrt -lm
