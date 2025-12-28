@@ -1,1 +1,1 @@
-console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.mode=skip noswap rootwait consoleblank=0 loglevel=3 vt.global_cursor_default=0 logo.nologo cma=256M usbcore.autosuspend=-1
+console=tty1 root=PARTUUID=3c15922b-02 rootfstype=ext4 elevator=deadline fsck.mode=skip noswap rootwait consoleblank=0 loglevel=3 vt.global_cursor_default=0 logo.nologo cma=256M usbcore.autosuspend=-1

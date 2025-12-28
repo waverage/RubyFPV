@@ -61,3 +61,13 @@ To login using SSH to your hardware (for debuging purposes), use these credentia
 # Adding support for new hardware
 
 If you are a hardware manufacturer and you want to add support in Ruby for your device (be it a SBC, camera, radio module, etc), please contact us at the address above.
+
+# Run commands:
+```
+./ruby_start > /dev/tty1 < /dev/tty1 2>&1
+```
+
+### Get PARTUUID
+```
+blkid
+```
