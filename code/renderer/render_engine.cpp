@@ -54,11 +54,11 @@ RenderEngine* render_init_engine()
    log_line("[RenderEngine] Renderer Engine Init...");
    if ( NULL == s_pRenderEngine )
    {
-      #if defined (HW_PLATFORM_RASPBERRY)
+      #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
       s_bRenderEngineSupportsRawFonts = true;
       s_pRenderEngine = new RenderEngineRaw();
       #endif
-      #if defined (HW_PLATFORM_RADXA)
+      #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
       s_bRenderEngineSupportsRawFonts = true;
       s_pRenderEngine = new RenderEngineCairo();
       #endif
