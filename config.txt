@@ -1,0 +1,47 @@
+# --- General Settings ---
+disable_overscan=1
+hdmi_force_hotplug=1
+dtparam=audio=on
+
+# --- Memory Management ---
+# Pi 5 uses dynamic memory allocation. gpu_mem is ignored.
+# Instead of gpu_mem=128, we leave it to the kernel.
+
+# --- Performance & Latency ---
+# Pi 5 Base Clocks: ARM 2.4GHz / GPU 800MHz
+force_turbo=1
+avoid_warnings=2
+
+# Overclocking for Pi 5 (Stable / Moderate)
+# Note: 900MHz (your Pi4 setting) would be a massive underclock for Pi 5.
+#arm_freq=2600
+#gpu_freq=900
+#over_voltage_delta=50000
+
+# Pi 5 uses different clock names; old freq_min settings are mostly legacy
+# force_turbo handles the 'min' frequency requirements for latency.
+
+# --- Connectivity & Boot ---
+disable_splash=1
+boot_delay=0
+
+# On Pi 5, this is the preferred way to enable UART
+dtparam=uart0=on
+
+# Disable wireless for lower RF interference (Standard RubyFPV practice)
+dtoverlay=disable-bt
+dtoverlay=disable-wifi
+
+# --- I/O & Interfaces ---
+dtparam=i2c_arm=on
+dtparam=spi=on
+
+# --- Camera & Display ---
+# Pi 5 uses auto-detect by default for official cameras
+camera_auto_detect=1
+display_auto_detect=1
+
+# --- Video Driver ---
+# Pi 5 does NOT support fkms. You MUST use kms.
+[all]
+dtoverlay=vc4-kms-v3d

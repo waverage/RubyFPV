@@ -12,3 +12,11 @@ cd WiringPi
 
 
 sudo apt install libsdl2-dev -y
+
+sudo apt install libcairo2-dev pkg-config -y
+
+
+# change /boot/firmware/config.txt
+# put binaries to /home/pi/ruby/
+# add executing "ruby_start" file in /home/pi/.profile and /root/.profile
+#
