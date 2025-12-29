@@ -1,0 +1,16 @@
+[Unit]
+Description=RubyFPV Ground Station
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/ruby
+ExecStart=/home/pi/ruby/start.sh
+Restart=always
+StandardInput=tty
+StandardOutput=tty
+TTYPath=/dev/tty1
+
+[Install]
+WantedBy=multi-user.target

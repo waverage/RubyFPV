@@ -782,6 +782,7 @@ const char* str_get_hardware_board_name(u32 board_type)
    static const char* s_szBoardTypePi3B = "Raspberry Pi 3B";
    static const char* s_szBoardTypePi3BP = "Raspberry Pi 3B+";
    static const char* s_szBoardTypePi4B = "Raspberry Pi 4B";
+   static const char* s_szBoardTypePi5 = "Raspberry Pi 5";
 
    static const char* s_szBoardTypeRadxaZero3 = "Radxa Zero 3";
    static const char* s_szBoardTypeRadxa3C = "Radxa 3C";
@@ -821,6 +822,8 @@ const char* str_get_hardware_board_name(u32 board_type)
       return s_szBoardTypePi3BP;
    if ( (board_type & BOARD_TYPE_MASK) == BOARD_TYPE_PI4B )
       return s_szBoardTypePi4B;
+   if ( (board_type & BOARD_TYPE_MASK) == BOARD_TYPE_PI5 )
+      return s_szBoardTypePi5;
 
    if ( (board_type & BOARD_TYPE_MASK) == BOARD_TYPE_RADXA_ZERO3 )
       return s_szBoardTypeRadxaZero3;

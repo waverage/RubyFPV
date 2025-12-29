@@ -15,6 +15,10 @@ sudo apt install libsdl2-dev -y
 
 sudo apt install libcairo2-dev pkg-config -y
 
+sudo chmod 777 /home/pi/ruby/start.sh
+
+sudo cp /home/pi/ruby/systemd_ruby.service /etc/systemd/system/ruby.service
+sudo systemctl enable ruby.service
 
 # change /boot/firmware/config.txt
 # put binaries to /home/pi/ruby/

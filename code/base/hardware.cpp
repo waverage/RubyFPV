@@ -729,6 +729,8 @@ u32 hardware_detectBoardType()
    if ( strcmp(szBoardId, "2a21041") == 0 ) { s_uHardwareBoardType = BOARD_TYPE_PI2BV11;}
    if ( strcmp(szBoardId, "2a01041") == 0 ) { s_uHardwareBoardType = BOARD_TYPE_PI2BV11;}
    if ( strcmp(szBoardId, "2a22042") == 0 ) { s_uHardwareBoardType = BOARD_TYPE_PI2BV12;}
+
+   if ( strcmp(szBoardId, "e04171") == 0 ) { s_uHardwareBoardType = BOARD_TYPE_PI5;}
    #endif
 
    #if defined (HW_PLATFORM_RADXA)
