@@ -75,10 +75,10 @@
 #include "../base/ruby_ipc.h"
 #include "../base/core_plugins_settings.h"
 #include "../base/utils.h"
-#if defined (HW_PLATFORM_RASPBERRY)
+#if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
 #include "../renderer/render_engine_raw.h"
 #endif
-#if defined (HW_PLATFORM_RADXA)
+#if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
 #include "../renderer/drm_core.h"
 #include "../renderer/render_engine_cairo.h"
 #include <SDL2/SDL.h>
@@ -2730,11 +2730,11 @@ int main(int argc, char *argv[])
 
    s_uTimeToSwitchLogLevel = get_current_timestamp_ms() + 10000;
    
-   #if defined (HW_PLATFORM_RASPBERRY)
+   #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
    hdmi_enum_modes();
    #endif
 
-   #if defined (HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
    ruby_drm_core_wait_for_display_connected();
    hdmi_enum_modes();
    int iHDMIIndex = hdmi_load_current_mode();
@@ -2977,7 +2977,7 @@ void ruby_reinit_hdmi_display()
    free_all_fonts();
    render_free_engine();
    
-   #if defined (HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
    ruby_drm_core_uninit();
    ruby_drm_core_wait_for_display_connected();
 
@@ -3056,7 +3056,7 @@ void ruby_shutdown_ui()
 
    render_free_engine();
 
-   #if defined (HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
    ruby_drm_core_uninit();
    #endif
 
