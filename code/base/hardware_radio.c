@@ -941,6 +941,7 @@ int _hardware_enumerate_wifi_radios()
       if ( (NULL != strstr(pszDriver,"rtl88xxau")) ||
            (NULL != strstr(pszDriver,"8812au")) ||
            (NULL != strstr(pszDriver,"rtl8812au")) ||
+           (NULL != strstr(pszDriver,"rtl8821au")) ||
            (NULL != strstr(pszDriver,"rtl88XXau")) ||
            (NULL != strstr(pszDriver,"8812eu")) ||
            (NULL != strstr(pszDriver,"88x2eu")) ||
@@ -960,11 +961,16 @@ int _hardware_enumerate_wifi_radios()
             sRadioInfo[i].iRadioType = RADIO_TYPE_REALTEK;
             sRadioInfo[i].iRadioDriver = RADIO_HW_DRIVER_REALTEK_8812AU;
          }
-         if ( NULL != strstr(pszDriver,"rtl8812au") )
+         if ( NULL != strstr(pszDriver,"rtl8812au") || NULL != strstr(pszDriver,"rtl8821au") )
          {
             sRadioInfo[i].iRadioType = RADIO_TYPE_REALTEK;
             sRadioInfo[i].iRadioDriver = RADIO_HW_DRIVER_REALTEK_RTL8812AU;
          }
+         // if ( NULL != strstr(pszDriver,"rtl8821au") )
+         // {
+         //    sRadioInfo[i].iRadioType = RADIO_TYPE_REALTEK;
+         //    sRadioInfo[i].iRadioDriver = RADIO_HW_DRIVER_REALTEK_RTL8821AU;
+         // }
          if ( (NULL != strstr(pszDriver,"8812eu")) || (NULL != strstr(pszDriver,"88x2eu")) )
          {
             sRadioInfo[i].iRadioType = RADIO_TYPE_REALTEK;
@@ -1238,6 +1244,35 @@ int hardware_radio_get_class_net_adapters_count()
    return iCount;
 }
 
+// int hardware_load_driver_rtl8821au()
+// {
+//    char szPlatform[128];
+//    hw_execute_bash_command("uname -r", szPlatform);
+//    removeTrailingNewLines(szPlatform);
+//    log_line("[Hardware] Loading driver RTL8821AU for platform: %s ...", szPlatform);
+
+//    char szOutput[256];
+   
+//    hw_execute_bash_command("sudo modprobe cfg80211", NULL);
+//    hw_execute_bash_command("sudo modprobe 8821au rtw_tx_pwr_idx_override=1 2>&1", szOutput);
+//    log_line("Modprobe result: [%s]", szOutput);
+//    if ( strlen(szOutput) > 10 )
+//    {
+//       log_softerror_and_alarm("[HW-R] Failed to load driver 8821AU on platform (%s), error: (%s)", szPlatform, szOutput);
+
+//       // Attempting the secondary module name used by some driver versions
+//       log_line("[HW-R] Attempting secondary module name 88XXau...");
+//       hw_execute_bash_command("sudo modprobe 88XXau rtw_tx_pwr_idx_override=1 2>&1", szOutput);
+      
+//       if ( strlen(szOutput) > 10 ) {
+//          log_softerror_and_alarm("[HW-R] Failed to load driver secondary driver 88XXau on platform (%s), error: (%s)", szPlatform, szOutput);
+//          return 0; // Failed both
+//       }
+//    }
+
+//    return 1;
+// }
+
 int hardware_load_driver_rtl8812au()
 {
    char szPlatform[128];
@@ -1266,14 +1301,22 @@ int hardware_load_driver_rtl8812au()
    #endif
 
    char szOutput[256];
-   
+
    hw_execute_bash_command("sudo modprobe cfg80211", NULL);
-   hw_execute_bash_command("sudo modprobe 88XXau rtw_tx_pwr_idx_override=1 2>&1", szOutput);
+   hw_execute_bash_command("sudo modprobe 8821au rtw_tx_pwr_idx_override=1 2>&1", szOutput);
    log_line("Modprobe result: [%s]", szOutput);
    if ( strlen(szOutput) > 10 )
    {
-      log_softerror_and_alarm("[HW-R] Failed to load driver 8812AU on platform (%s), error: (%s)", szPlatform, szOutput);
-      return hardware_install_driver_rtl8812au(0);
+      log_softerror_and_alarm("[HW-R] Failed to load driver 8821AU on platform (%s), error: (%s)", szPlatform, szOutput);
+
+      // Attempting the secondary module name used by some driver versions
+      log_line("[HW-R] Attempting secondary module name 88XXau...");
+      hw_execute_bash_command("sudo modprobe 88XXau rtw_tx_pwr_idx_override=1 2>&1", szOutput);
+      
+      if ( strlen(szOutput) > 10 ) {
+         log_softerror_and_alarm("[HW-R] Failed to load driver secondary driver 88XXau on platform (%s), error: (%s)", szPlatform, szOutput);
+         return hardware_install_driver_rtl8812au(0);
+      }
    }
 
    return 1;
@@ -1374,10 +1417,35 @@ int hardware_radio_load_radio_modules(int iEchoToConsole)
    log_line("[HW-R] Loading radio modules...");
 
    int iRTL8812AULoaded = 0;
+   // int iRTL8821AULoaded = 0;
    int iRTL8812EULoaded = 0;
    int iRTL8733BULoaded = 0;
    int iAtherosLoaded = 0;
    int iCountLoaded = 0;
+
+   // if ( hardware_radio_has_rtl8821au_cards() )
+   // {
+   //    if ( iEchoToConsole )
+   //    {
+   //       printf("Ruby: Adding radio modules for RTL8821AU radio cards...\n");
+   //       fflush(stdout);
+   //    }
+   //    log_line("[HW-R] Found RTL8821AU cards. Loading module...");
+   //    if ( 1 != hardware_load_driver_rtl8821au() )
+   //    {
+   //       log_softerror_and_alarm("[HW-R] Error on loading driver RTL8821AU");
+   //       if ( iEchoToConsole )
+   //       {
+   //          printf("Ruby: ERROR on loading driver RTL8821AU\n");
+   //          fflush(stdout);
+   //       }
+   //    }
+   //    else
+   //    {
+   //       iRTL8821AULoaded = 1;
+   //       iCountLoaded++;
+   //    }
+   // }
 
    if ( hardware_radio_has_rtl8812au_cards() )
    {
@@ -1726,6 +1794,17 @@ void hardware_install_drivers(int iEchoToConsole)
       printf("Ruby: Installing drivers for platform: %s ...\n", szPlatform);
       fflush(stdout);
    }
+
+   #if defined (HW_PLATFORM_RASPBERRY_PI5)
+   log_line("[HW-R] Skipping installing drivers for PI 5.");
+   if ( iEchoToConsole )
+   {
+      printf("Ruby: Skipping installing drivers for PI 5.\n");
+      fflush(stdout);
+   }
+   return;
+   #endif
+
    #if defined (HW_PLATFORM_OPENIPC_CAMERA)
    log_line("[HW-R] Drivers are already installed on OpenIPC.");
    #else
@@ -2121,6 +2200,35 @@ int hardware_radio_has_rtl8812au_cards()
    return iCount;
 }
 
+// int hardware_radio_has_rtl8821au_cards()
+// {
+//    if ( ! s_HardwareRadiosEnumeratedOnce )
+//    if ( 0 == s_iHwRadiosCount )
+//    if ( ! s_iEnumeratedUSBRadioInterfaces )
+//       _hardware_find_usb_radio_interfaces_info();
+
+//    int iCount = 0;
+
+//    if ( 0 < s_iHwRadiosCount )
+//    {
+//       for( int i=0; i<s_iHwRadiosCount; i++ )
+//       {
+//          if ( hardware_radio_driver_is_rtl8821au_card(sRadioInfo[i].iRadioDriver) )
+//             iCount++;
+//       }
+//    }
+
+//    if ( iCount > 0 )
+//       return iCount;
+
+//    for( int i=0; i<s_iFoundUSBRadioInterfaces; i++ )
+//    {
+//        if ( hardware_radio_driver_is_rtl8821au_card(s_USB_RadioInterfacesInfo[i].iDriver) )
+//           iCount++;
+//    }
+//    return iCount;
+// }
+
 int hardware_radio_has_rtl8812eu_cards()
 {
    if ( ! s_HardwareRadiosEnumeratedOnce )
@@ -2215,6 +2323,13 @@ int hardware_radio_driver_is_rtl8812au_card(int iDriver)
       return 1;
    return 0;
 }
+
+// int hardware_radio_driver_is_rtl8821au_card(int iDriver)
+// {
+//    if (iDriver == RADIO_HW_DRIVER_REALTEK_RTL8821AU)
+//       return 1;
+//    return 0;
+// }
 
 int hardware_radio_driver_is_rtl8812eu_card(int iDriver)
 {

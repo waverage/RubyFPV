@@ -11,6 +11,9 @@ Restart=always
 StandardInput=tty
 StandardOutput=tty
 TTYPath=/dev/tty1
+# ALSO save everything to a file
+StandardError=append:/home/pi/ruby/logs/service_errors.log
+StandardOutput=append:/home/pi/ruby/logs/service_output.log
 
 [Install]
 WantedBy=multi-user.target

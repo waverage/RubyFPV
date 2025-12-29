@@ -25,6 +25,7 @@
 #define RADIO_HW_DRIVER_SERIAL 9
 #define RADIO_HW_DRIVER_REALTEK_8812EU 10          // 88x2eu
 #define RADIO_HW_DRIVER_REALTEK_8733BU 15          // 88733bu
+#define RADIO_HW_DRIVER_REALTEK_RTL8821AU 17       // rtl8821au
 
 
 // 0 is generic card model
