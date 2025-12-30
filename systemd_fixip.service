@@ -5,7 +5,7 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/ip addr add 192.168.1.100/24 dev eth0
+ExecStart=/usr/sbin/ip addr add 192.168.1.2/24 dev eth0
 ExecStartPost=/usr/bin/ip link set eth0 up
 RemainAfterExit=yes
 Restart=no
