@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
    bool bHasETH = ((hardware_has_eth() != NULL)?true:false);
 
    // DHCP
-   if ( ( access( "/boot/nodhcp", R_OK ) != -1 ) || (!bHasETH) )
+   if ( ( access( "/boot/firmware/nodhcp", R_OK ) != -1 ) || (!bHasETH) )
    {
       log_line("DHCP/ETH can't be enabled.");
 
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
          return 0;
       }
 
-      log_line("DHCP is disabled with /boot/nodhcp option.");
+      log_line("DHCP is disabled with /boot/firmware/nodhcp option.");
       if ( bIsStation )
          _check_set_fixed_ip();
       log_line("Done DHCP/ETH Configuration.");

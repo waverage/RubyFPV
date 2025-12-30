@@ -599,10 +599,10 @@ int _copy_config_files()
       hardware_mount_boot();
       hardware_sleep_ms(200);
       char szComm[MAX_FILE_PATH_SIZE];
-      snprintf(szComm, sizeof(szComm)/sizeof(szComm[0]), "cp -rf %s /boot/config.txt", szSourceFile);
+      snprintf(szComm, sizeof(szComm)/sizeof(szComm[0]), "cp -rf %s /boot/firmware/config.txt", szSourceFile);
       //hw_execute_process_wait(szComm);
       hw_execute_bash_command(szComm, NULL);
-      hw_execute_process_wait("chmod 777 /boot/config.txt");
+      hw_execute_process_wait("chmod 777 /boot/firmware/config.txt");
    }
 
    snprintf(szSourceFile, sizeof(szSourceFile)/sizeof(szSourceFile[0]), "%s%sonyxfpv_config.txt", g_szUpdateUnpackFolder, SUBFOLDER_UPDATES_PI);
@@ -611,10 +611,10 @@ int _copy_config_files()
       hardware_mount_boot();
       hardware_sleep_ms(200);
       char szComm[MAX_FILE_PATH_SIZE];
-      snprintf(szComm, sizeof(szComm)/sizeof(szComm[0]), "cp -rf %s /boot/config.txt", szSourceFile);
+      snprintf(szComm, sizeof(szComm)/sizeof(szComm[0]), "cp -rf %s /boot/firmware/config.txt", szSourceFile);
       //hw_execute_process_wait(szComm);
       hw_execute_bash_command(szComm, NULL);
-      hw_execute_process_wait("chmod 777 /boot/config.txt");
+      hw_execute_process_wait("chmod 777 /boot/firmware/config.txt");
    }
    #endif
 

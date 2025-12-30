@@ -95,7 +95,7 @@ void _forward_on_usb_device_detected()
 
    if ( ! bHasETH )
       log_line("No ETH port. No further action on USB tethering start.");
-   else if ( ( access( "/boot/nodhcp", R_OK ) != -1 ) )
+   else if ( ( access( "/boot/firmware/nodhcp", R_OK ) != -1 ) )
       log_line("DHCP is disabled. No further action on USB tethering start.");
    else
    {
@@ -131,7 +131,7 @@ void _forward_on_usb_device_unplugged()
 
    if ( ! bHasETH )
       log_line("No ETH port. No further action on USB tethering stop.");
-   else if ( ( access( "/boot/nodhcp", R_OK ) != -1 ) )
+   else if ( ( access( "/boot/firmware/nodhcp", R_OK ) != -1 ) )
       log_line("DHCP is disabled. No further action on USB tethering stop.");
    else
    {

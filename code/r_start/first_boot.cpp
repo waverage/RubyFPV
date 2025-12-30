@@ -146,13 +146,13 @@ void do_first_boot_initialization_raspberry(bool bIsVehicle, u32 uBoardType)
    if ( ((uBoardType & BOARD_TYPE_MASK) == BOARD_TYPE_PIZERO) || ( (uBoardType & BOARD_TYPE_MASK) == BOARD_TYPE_PIZEROW) )
    {
       log_line("Raspberry Pi Zero detected on the first boot ever of the system. Updating settings for Pi Zero.");
-      //sprintf(szBuff, "sed -i 's/over_voltage=[0-9]*/over_voltage=%d/g' /boot/config.txt", 5);
+      //sprintf(szBuff, "sed -i 's/over_voltage=[0-9]*/over_voltage=%d/g' /boot/firmware/config.txt", 5);
       //execute_bash_command(szBuff);
    }
    if ( (uBoardType & BOARD_TYPE_MASK) == BOARD_TYPE_PIZERO2 )
    {
       log_line("Raspberry Pi Zero 2 detected on the first boot ever of the system. Updating settings for Pi Zero 2.");
-      //sprintf(szBuff, "sed -i 's/over_voltage=[0-9]*/over_voltage=%d/g' /boot/config.txt", 5);
+      //sprintf(szBuff, "sed -i 's/over_voltage=[0-9]*/over_voltage=%d/g' /boot/firmware/config.txt", 5);
       //execute_bash_command(szBuff);
    }
 }
@@ -252,12 +252,12 @@ void do_first_boot_initialization(bool bIsVehicle, u32 uBoardType)
 
          hardware_mount_boot();
          hardware_sleep_ms(50);
-         hw_execute_bash_command("cp /boot/config.txt config.txt", NULL);
+         hw_execute_bash_command("cp /boot/firmware/config.txt config.txt", NULL);
 
          config_file_set_value("config.txt", "arm_freq", pcs->iFreqARM);
          config_file_set_value("config.txt", "arm_freq_min", pcs->iFreqARM);
 
-         hw_execute_bash_command("cp config.txt /boot/config.txt", NULL);
+         hw_execute_bash_command("cp config.txt /boot/firmware/config.txt", NULL);
       }
       #endif
 
@@ -317,7 +317,7 @@ Model* first_boot_create_default_model(bool bIsVehicle, u32 uBoardType)
 
       hardware_mount_boot();
       hardware_sleep_ms(50);
-      hw_execute_bash_command("cp /boot/config.txt config.txt", NULL);
+      hw_execute_bash_command("cp /boot/firmware/config.txt config.txt", NULL);
 
       s_ModelFirstBoot.processesPriorities.iFreqARM = DEFAULT_ARM_FREQ;
       if ( (uBoardType & BOARD_TYPE_MASK) == BOARD_TYPE_PIZERO2 )
@@ -337,7 +337,7 @@ Model* first_boot_create_default_model(bool bIsVehicle, u32 uBoardType)
       config_file_force_value("config.txt", "ignore_lcd", 0);
       //config_file_force_value("config.txt", "hdmi_safe", 1);
         
-      hw_execute_bash_command("cp config.txt /boot/config.txt", NULL);
+      hw_execute_bash_command("cp config.txt /boot/firmware/config.txt", NULL);
       #endif
 
       #if defined(HW_PLATFORM_OPENIPC_CAMERA)

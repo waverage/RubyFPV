@@ -408,10 +408,10 @@ void MenuControllerVideo::onSelectItem()
 
       hardware_mount_boot();
       hardware_sleep_ms(50);
-      hw_execute_bash_command("cp /boot/config.txt config.txt", NULL);
+      hw_execute_bash_command("cp /boot/firmware/config.txt config.txt", NULL);
       snprintf(szBuff, sizeof(szBuff)/sizeof(szBuff[0]), "sed -i 's/config_hdmi_boost=[0-9]*/config_hdmi_boost=%d/g' config.txt", hdmi_boost);
       hw_execute_bash_command(szBuff, NULL);
-      hw_execute_bash_command("cp config.txt /boot/config.txt", NULL);
+      hw_execute_bash_command("cp config.txt /boot/firmware/config.txt", NULL);
       
       save_ControllerSettings();
       return;
@@ -439,10 +439,10 @@ void MenuControllerVideo::onSelectItem()
       save_ControllerSettings();
       hardware_mount_boot();
       hardware_sleep_ms(50);
-      hw_execute_bash_command("cp /boot/config.txt config.txt", NULL);
+      hw_execute_bash_command("cp /boot/firmware/config.txt config.txt", NULL);
 
       config_file_force_value("config.txt", "disable_overscan", pCS->iDisableHDMIOverscan);
-      hw_execute_bash_command("cp config.txt /boot/config.txt", NULL);
+      hw_execute_bash_command("cp config.txt /boot/firmware/config.txt", NULL);
 
       invalidate();
       valuesToUI();

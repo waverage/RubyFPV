@@ -801,8 +801,8 @@ void do_generic_update()
    #endif
    
    #if defined (HW_PLATFORM_RASPBERRY)
-   hw_execute_bash_command("cp -rf ruby_update.log /boot/ 2>/dev/null", NULL);
-   hw_execute_bash_command("cp -rf onyxfpv_update.log /boot/ 2>/dev/null", NULL);
+   hw_execute_bash_command("cp -rf ruby_update.log /boot/firmware/ 2>/dev/null", NULL);
+   hw_execute_bash_command("cp -rf onyxfpv_update.log /boot/firmware/ 2>/dev/null", NULL);
    #endif
    #if defined (HW_PLATFORM_RADXA)
    hw_execute_bash_command("cp -rf ruby_update.log /config/ 2>/dev/null", NULL);

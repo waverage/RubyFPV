@@ -114,15 +114,32 @@
 #define FOLDER_RUBY_TEMP "/home/pi/ruby/tmp/"
 #define FOLDER_USB_MOUNT "/home/pi/ruby/tmp/tmpusbfiles/"
 #define FOLDER_TEMP_VIDEO_MEM "/home/pi/ruby/tmp/memdisk/"
-#define FOLDER_WINDOWS_PARTITION "/boot/"
+
 #define FOLDER_CALIBRATION_FILES "/home/pi/ruby/cal/"
 
+#ifdef HW_PLATFORM_RASPBERRY_PI5
+#define FOLDER_BOOT_FW "/boot/firmware"
+
+#define FOLDER_WINDOWS_PARTITION "/boot/firmware"
+#define FILE_FORCE_VEHICLE "/boot/firmware/forcevehicle"
+#define FILE_FORCE_VEHICLE_NO_CAMERA "/boot/firmware/force_no_camera"
+#define FILE_FORCE_CONTROLLER "/boot/firmware/forcecontroller"
+#define FILE_FORCE_ROUTER "/boot/firmware/forcerouter"
+#define FILE_FORCE_RESET "/boot/firmware/forcereset"
+#define FILE_BOOT_LOG_STEPS "/boot/firmware/bootstepslog.txt"
+
+#else
+
+#define FOLDER_BOOT_FW "/boot"
+#define FOLDER_WINDOWS_PARTITION "/boot/"
 #define FILE_FORCE_VEHICLE "/boot/forcevehicle"
 #define FILE_FORCE_VEHICLE_NO_CAMERA "/boot/force_no_camera"
 #define FILE_FORCE_CONTROLLER "/boot/forcecontroller"
 #define FILE_FORCE_ROUTER "/boot/forcerouter"
 #define FILE_FORCE_RESET "/boot/forcereset"
 #define FILE_BOOT_LOG_STEPS "/boot/bootstepslog.txt"
+
+#endif
 
 //#define VIDEO_RECORDER_COMMAND "raspivid"
 //#define VIDEO_RECORDER_COMMAND_VEYE "/usr/local/bin/veye_raspivid"

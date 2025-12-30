@@ -292,13 +292,13 @@ void _hardware_detectSystemType()
 
 
    #if defined (HW_PLATFORM_RASPBERRY)
-   fd = fopen("/boot/ruby_board.txt", "w");
+   fd = fopen("/boot/firmware/ruby_board.txt", "w");
    if ( NULL != fd )
    {
       fprintf(fd, "%u\n", s_uHardwareBoardType);
       fclose(fd);
    }
-   hw_execute_bash_command("cat /proc/device-tree/model > /boot/ruby_board_desc.txt", NULL);
+   hw_execute_bash_command("cat /proc/device-tree/model > /boot/firmware/ruby_board_desc.txt", NULL);
    #endif
 
    #if defined (HW_PLATFORM_OPENIPC_CAMERA)

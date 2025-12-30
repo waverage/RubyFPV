@@ -196,7 +196,7 @@ void MenuControllerExpert::writeConfigFile()
    hardware_mount_boot();
    hardware_sleep_ms(50);
    ruby_signal_alive();
-   hw_execute_bash_command("cp /boot/config.txt config.txt", NULL);
+   hw_execute_bash_command("cp /boot/firmware/config.txt config.txt", NULL);
 
    config_file_set_value("config.txt", "over_voltage", pcs->iOverVoltage);
    config_file_set_value("config.txt", "over_voltage_sdram", pcs->iOverVoltage);
@@ -219,7 +219,7 @@ void MenuControllerExpert::writeConfigFile()
    config_file_set_value("config.txt", "sdram_freq_min", pcs->iFreqGPU);
    ruby_signal_alive();
 
-   hw_execute_bash_command("cp config.txt /boot/config.txt", NULL);
+   hw_execute_bash_command("cp config.txt /boot/firmware/config.txt", NULL);
    #endif
    ruby_signal_alive();
 }

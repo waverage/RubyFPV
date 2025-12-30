@@ -639,7 +639,7 @@ int r_start_vehicle(int argc, char *argv[])
    if ( read_config_file() )
       bMustSave = true;
 
-   if ( access( "/boot/nodhcp", R_OK ) == -1 )
+   if ( access( "/boot/firmware/nodhcp", R_OK ) == -1 )
    {
        if ( ! modelVehicle.enableDHCP )
           bMustSave = true;

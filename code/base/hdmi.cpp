@@ -97,12 +97,12 @@ int _hdmi_detect_current_mode()
    int hgroup = 0;
    int hmode = 0;
    szBuff[0] = 0;
-   hw_execute_bash_command_silent("cat /boot/config.txt | grep hdmi_group | sed -r 's/[=]+//g' | sed -r 's/[hdmi_group]+//g'", szBuff);
+   hw_execute_bash_command_silent("cat /boot/firmware/config.txt | grep hdmi_group | sed -r 's/[=]+//g' | sed -r 's/[hdmi_group]+//g'", szBuff);
    if ( 0 != szBuff[0] )
       sscanf(szBuff, "%d", &hgroup);
 
    szBuff[0] = 0;   
-   hw_execute_bash_command_silent("cat /boot/config.txt | grep hdmi_mode | sed -r 's/[=]+//g' | sed -r 's/[hdmi_mode]+//g'", szBuff);
+   hw_execute_bash_command_silent("cat /boot/firmware/config.txt | grep hdmi_mode | sed -r 's/[=]+//g' | sed -r 's/[hdmi_mode]+//g'", szBuff);
    if ( 0 != szBuff[0] )
       sscanf(szBuff, "%d", &hmode);
 
@@ -445,14 +445,14 @@ int hdmi_set_current_resolution(int width, int height, int refresh)
    #if defined (HW_PLATFORM_RASPBERRY)
    hardware_mount_boot();
    hardware_sleep_ms(50);
-   hw_execute_bash_command("cp /boot/config.txt config.txt", NULL);
+   hw_execute_bash_command("cp /boot/firmware/config.txt config.txt", NULL);
 
    char szBuff[256];
    sprintf(szBuff, "sed -i 's/hdmi_group=[0-9]*/hdmi_group=%d/g' config.txt", s_nHDMI_ResolutionGroup[indexResolution][indexRefresh]);
    hw_execute_bash_command(szBuff, NULL);
    sprintf(szBuff, "sed -i 's/hdmi_mode=[0-9]*/hdmi_mode=%d/g' config.txt", s_nHDMI_ResolutionMode[indexResolution][indexRefresh]);
    hw_execute_bash_command(szBuff, NULL);
-   hw_execute_bash_command("cp config.txt /boot/config.txt", NULL);
+   hw_execute_bash_command("cp config.txt /boot/firmware/config.txt", NULL);
    #endif
 
    #if defined (HW_PLATFORM_RADXA)

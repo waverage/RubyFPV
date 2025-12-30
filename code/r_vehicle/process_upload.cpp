@@ -351,7 +351,7 @@ static void * _thread_process_upload(void *argument)
    {
       hardware_mount_boot();
       hardware_sleep_ms(200);
-      snprintf(szComm, sizeof(szComm)/sizeof(szComm[0]), "mv %s /boot/config.txt", szFile);
+      snprintf(szComm, sizeof(szComm)/sizeof(szComm[0]), "mv %s /boot/firmware/config.txt", szFile);
       hw_execute_bash_command(szComm, NULL);
    }
    #endif

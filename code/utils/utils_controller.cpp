@@ -144,7 +144,7 @@ int controller_utils_export_all_to_usb()
    hw_execute_bash_command(szComm, NULL);
 
    #ifdef HW_PLATFORM_RASPBERRY
-   sprintf(szComm, "zip -r %s/importexport/%s /boot/config.txt", FOLDER_RUBY_TEMP, szOutFile);
+   sprintf(szComm, "zip -r %s/importexport/%s /boot/firmware/config.txt", FOLDER_RUBY_TEMP, szOutFile);
    hw_execute_bash_command(szComm, NULL);
    #endif
 
@@ -262,7 +262,7 @@ int controller_utils_import_all_from_usb(bool bImportAnyFound)
    hw_execute_bash_command(szComm, NULL);
 
    #ifdef HW_PLATFORM_RASPBERRY
-   hw_execute_bash_command("cp -rf boot/config.txt /boot/config.txt", NULL);
+   hw_execute_bash_command("cp -rf boot/config.txt /boot/firmware/config.txt", NULL);
    hw_execute_bash_command("rm -rf boot/config.txt", NULL);
    #endif
 

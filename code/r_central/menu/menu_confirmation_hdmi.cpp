@@ -97,13 +97,13 @@ void MenuConfirmationHDMI::onSelectItem()
          sprintf(szBuff, "rm -rf %s%s", FOLDER_CONFIG, FILE_TEMP_HDMI_CHANGED);
          hw_execute_bash_command(szBuff, NULL);
 
-         hw_execute_bash_command("cp /boot/config.txt config.txt", NULL);
+         hw_execute_bash_command("cp /boot/firmware/config.txt config.txt", NULL);
 
          sprintf(szBuff, "sed -i 's/hdmi_group=[0-9]*/hdmi_group=%d/g' config.txt", group);
          hw_execute_bash_command(szBuff, NULL);
          sprintf(szBuff, "sed -i 's/hdmi_mode=[0-9]*/hdmi_mode=%d/g' config.txt", mode);
          hw_execute_bash_command(szBuff, NULL);
-         hw_execute_bash_command("cp config.txt /boot/config.txt", NULL);
+         hw_execute_bash_command("cp config.txt /boot/firmware/config.txt", NULL);
       }
 
       menu_stack_pop(0);

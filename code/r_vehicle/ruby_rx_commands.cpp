@@ -507,7 +507,7 @@ void save_config_file()
    #if defined (HW_PLATFORM_RASPBERRY)
    hardware_mount_boot();
    hardware_sleep_ms(200);
-   hw_execute_bash_command("cp /boot/config.txt config.txt", NULL);
+   hw_execute_bash_command("cp /boot/firmware/config.txt config.txt", NULL);
 
    config_file_set_value("config.txt", "over_voltage", g_pCurrentModel->processesPriorities.iOverVoltage);
    config_file_set_value("config.txt", "over_voltage_sdram", g_pCurrentModel->processesPriorities.iOverVoltage);
@@ -526,7 +526,7 @@ void save_config_file()
    config_file_set_value("config.txt", "sdram_freq", g_pCurrentModel->processesPriorities.iFreqGPU);
    config_file_set_value("config.txt", "sdram_freq_min", g_pCurrentModel->processesPriorities.iFreqGPU);
 
-   hw_execute_bash_command("cp config.txt /boot/config.txt", NULL);
+   hw_execute_bash_command("cp config.txt /boot/firmware/config.txt", NULL);
    #endif
 }
 
@@ -2924,12 +2924,12 @@ bool process_command(u8* pBuffer, int length)
       if ( g_pCurrentModel->enableDHCP )
       {
          log_line("Enabling DHCP");
-         hw_execute_bash_command("rm -f /boot/nodhcp", NULL);
+         hw_execute_bash_command("rm -f /boot/firmware/nodhcp", NULL);
       }
       else
       {
          log_line("Disabling DHCP");
-         hw_execute_bash_command("echo '1' > /boot/nodhcp", NULL);
+         hw_execute_bash_command("echo '1' > /boot/firmware/nodhcp", NULL);
       }
       return true;
    }

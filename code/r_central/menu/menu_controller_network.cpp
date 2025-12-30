@@ -94,7 +94,7 @@ void MenuControllerNetwork::valuesToUI()
 {
    ControllerSettings* pCS = get_ControllerSettings();
    
-   if( access( "/boot/nodhcp", R_OK ) == -1 )
+   if( access( "/boot/firmware/nodhcp", R_OK ) == -1 )
       m_pItemsSelect[0]->setSelection(1);
    else
       m_pItemsSelect[0]->setSelection(0);
@@ -147,14 +147,14 @@ void MenuControllerNetwork::onSelectItem()
       if ( 1 == m_pItemsSelect[0]->getSelectedIndex() )
       {
          log_line("Enabling DHCP");
-         hw_execute_bash_command("rm -f /boot/nodhcp", NULL);
+         hw_execute_bash_command("rm -f /boot/firmware/nodhcp", NULL);
          pCS->nUseFixedIP = 0;
          save_ControllerSettings();
       }
       else
       {
          log_line("Disabling DHCP");
-         hw_execute_bash_command("echo '1' > /boot/nodhcp", NULL);
+         hw_execute_bash_command("echo '1' > /boot/firmware/nodhcp", NULL);
       }
       valuesToUI();
       send_control_message_to_router(PACKET_TYPE_LOCAL_CONTROL_CONTROLLER_CHANGED, PACKET_COMPONENT_LOCAL_CONTROL);       
@@ -166,7 +166,7 @@ void MenuControllerNetwork::onSelectItem()
       pCS->nUseFixedIP = m_pItemsSelect[1]->getSelectedIndex();
       save_ControllerSettings();
       if ( 1 == pCS->nUseFixedIP )
-         hw_execute_bash_command("echo '1' > /boot/nodhcp", NULL);
+         hw_execute_bash_command("echo '1' > /boot/firmware/nodhcp", NULL);
       valuesToUI();
       send_control_message_to_router(PACKET_TYPE_LOCAL_CONTROL_CONTROLLER_CHANGED, PACKET_COMPONENT_LOCAL_CONTROL);       
       return;
@@ -186,7 +186,7 @@ void MenuControllerNetwork::onSelectItem()
    if ( m_IndexSSH == m_SelectedIndex )
    {
       #if defined(HW_PLATFORM_RASPBERRY)
-      hw_execute_bash_command("touch /boot/ssh", NULL);
+      hw_execute_bash_command("touch /boot/firmware/ssh", NULL);
       #endif
 
       #if defined(HW_PLATFORM_RADXA)

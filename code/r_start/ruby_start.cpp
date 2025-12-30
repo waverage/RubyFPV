@@ -308,7 +308,7 @@ void detectSystemType()
    FILE* fd = NULL;
    
    #ifdef HW_PLATFORM_RASPBERRY
-   fd = fopen("/boot/ruby_systype.txt", "w");
+   fd = fopen("/boot/firmware/ruby_systype.txt", "w");
    #endif
    #ifdef HW_PLATFORM_RADXA
    fd = fopen("/config/ruby_systype.txt", "w");
@@ -835,8 +835,8 @@ int _step_find_console()
    #ifdef HW_PLATFORM_RASPBERRY
    //execute_bash_command_silent("con2fbmap 1 0", NULL);
    system("sudo mount -o remount,rw /");
-   system("sudo mount -o remount,rw /boot");
-   system("cd /boot; sudo mount -o remount,rw /boot; cd /home/pi/ruby");
+   system("sudo mount -o remount,rw /boot/firmware");
+   system("cd /boot/firmware; sudo mount -o remount,rw /boot/firmware; cd /home/pi/ruby");
    hardware_sleep_ms(50);
    #endif
 
@@ -932,11 +932,11 @@ int _step_check_file_system()
 
       #ifdef HW_PLATFORM_RASPBERRY
       system("sudo mount -o remount,rw /");
-      system("sudo mount -o remount,rw /boot");
-      system("cd /boot; sudo mount -o remount,rw /boot; cd /home/pi/ruby");
+      system("sudo mount -o remount,rw /boot/firmware");
+      system("cd /boot/firmware; sudo mount -o remount,rw /boot/firmware; cd /home/pi/ruby");
       hardware_mount_root();
       hardware_mount_boot();
-      hw_execute_bash_command_silent("cd /boot; mount -o remount,rw /boot; cd /home/pi/ruby", NULL);
+      hw_execute_bash_command_silent("cd /boot/firmware; mount -o remount,rw /boot/firmware; cd /home/pi/ruby", NULL);
       hardware_sleep_ms(100);
       #endif
 
@@ -2210,9 +2210,9 @@ int main(int argc, char *argv[])
    log_line("Network devices found: [%s]", szOutput);
 
    #ifdef HW_PLATFORM_RASPBERRY
-   hw_execute_bash_command("rm -rf /boot/last_ruby_boot.txt", NULL);
-   hw_execute_bash_command("cp -rf logs/log_system.txt /boot/last_ruby_boot.txt", NULL);
-   log_line("Copy boot log to /boot partition. Done.");
+   hw_execute_bash_command("rm -rf /boot/firmware/last_ruby_boot.txt", NULL);
+   hw_execute_bash_command("cp -rf logs/log_system.txt /boot/firmware/last_ruby_boot.txt", NULL);
+   log_line("Copy boot log to /boot/firmware partition. Done.");
    #endif
 
    #ifdef HW_PLATFORM_RADXA
