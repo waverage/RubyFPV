@@ -1,0 +1,15 @@
+[Unit]
+Description=RubyFPV fix IP service
+DefaultDependencies=no
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/ip addr add 192.168.1.100/24 dev eth0
+ExecStartPost=/usr/bin/ip link set eth0 up
+RemainAfterExit=yes
+Restart=no
+User=root
+
+[Install]
+WantedBy=multi-user.target
