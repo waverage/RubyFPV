@@ -807,14 +807,14 @@ int _step_find_console()
    tty_name = szConsoleName;
    #endif
 
-   if ( (NULL == tty_name) || (!foundGoodConsole) )
-   {
-      sprintf(szComm, "echo 'Ruby execute in wrong console. Abort.' >> /tmp/ruby_boot.log");
-      hw_execute_bash_command_silent(szComm, NULL);
-      printf("\nRuby: Try to execute in wrong console (%s). Exiting.\n", tty_name != NULL ? tty_name:"N/A");
-      fflush(stdout);
-      return 0;
-   }
+   // if ( (NULL == tty_name) || (!foundGoodConsole) )
+   // {
+   //    sprintf(szComm, "echo 'Ruby execute in wrong console. Abort.' >> /tmp/ruby_boot.log");
+   //    hw_execute_bash_command_silent(szComm, NULL);
+   //    printf("\nRuby: Try to execute in wrong console (%s). Exiting.\n", tty_name != NULL ? tty_name:"N/A");
+   //    fflush(stdout);
+   //    return 0;
+   // }
    
    sprintf(szComm, "echo 'Ruby check semaphore...' >> /tmp/ruby_boot.log");
    hw_execute_bash_command_silent(szComm, NULL);

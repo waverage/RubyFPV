@@ -3,7 +3,7 @@
 touch /tmp/debug
 echo "Mounting file systems..."
 #mount -o remount,rw /
-#mount -o remount,rw /boot
+#mount -o remount,rw /boot/firmware
 echo "adding eth0 ip for debugging..."
 ip link set eth0 up
 ip addr add 192.168.1.2/24 dev eth0 2>/dev/null || true
@@ -19,4 +19,6 @@ cd /home/pi/ruby
 echo "Launch done."
 
 sleep 2
+mkdir -p logs
+touch logs/log_system.txt
 tail -f logs/log_system.txt
