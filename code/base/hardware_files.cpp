@@ -136,9 +136,7 @@ void hardware_mount_root()
 void hardware_mount_boot()
 {
    #ifdef HW_PLATFORM_RASPBERRY
-   char szComm[MAX_FILE_PATH_SIZE];
-   sprintf(szComm, "sudo mount -o remount,rw %s", FOLDER_BOOT_FW);
-   hw_execute_bash_command(szComm, NULL);
+   hw_execute_bash_command("sudo mount -o remount,rw /boot/firmware", NULL)
    #endif
 }
 

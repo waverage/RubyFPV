@@ -57,7 +57,7 @@ int config_file_get_value(const char* szPropName)
    char* szTmp = NULL;
    int value = 0;
 
-   sprintf(szComm, "grep '#%s!=' %s/config.txt", szPropName, FOLDER_BOOT_FW);
+   sprintf(szComm, "grep '#%s!=' /boot/firmware/config.txt", szPropName);
    hw_execute_bash_command_silent(szComm, szOut);
    if ( strlen(szOut) > 5 )
    {
@@ -68,7 +68,7 @@ int config_file_get_value(const char* szPropName)
          value = -value;
    }
 
-   sprintf(szComm, "grep '%s=' %s/config.txt", szPropName, FOLDER_BOOT_FW);
+   sprintf(szComm, "grep '%s=' /boot/firmware/config.txt", szPropName);
    hw_execute_bash_command_silent(szComm, szOut);
    if ( strlen(szOut) > 5 )
    {
