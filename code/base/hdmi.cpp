@@ -6,7 +6,7 @@
 #include "hardware_procs.h"
 #include <errno.h>
 #include <unistd.h>
-#if defined(HW_PLATFORM_RADXA)
+#if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
 #include <linux/videodev2.h>
 #include <rockchip/rk_mpi.h>
 
@@ -92,7 +92,7 @@ int _hdmi_detect_current_mode()
 {
    log_line("[HDMI] Detecting current HDMI mode...");
 
-   #if defined (HW_PLATFORM_RASPBERRY)
+   #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
    char szBuff[1024];
    int hgroup = 0;
    int hmode = 0;
@@ -135,7 +135,7 @@ int _hdmi_detect_current_mode()
    return -1;
    #endif
 
-   #if defined (HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
 
    // Mode[0] is always the current display mode
    s_nHDMI_CurrentResolutionIndex = 0;
@@ -229,7 +229,7 @@ int hdmi_enum_modes()
    s_nHDMI_CurrentResolutionIndex = -1;
    s_nHDMI_CurrentResolutionRefreshIndex = -1;
 
-   #if defined (HW_PLATFORM_RASPBERRY)
+   #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
    _hdmi_add_resolution(1,1, 640, 480, 60, HDMI_ASPECT_MODE_4_3);
    _hdmi_add_resolution(2,9, 800, 600, 60, HDMI_ASPECT_MODE_4_3);
    _hdmi_add_resolution(2,16, 1024, 768, 60, HDMI_ASPECT_MODE_4_3);
@@ -256,7 +256,7 @@ int hdmi_enum_modes()
    return 0;
    #endif
 
-   #if defined (HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
    return _hdmi_detect_current_mode();
    #endif
 }
@@ -442,7 +442,7 @@ int hdmi_set_current_resolution(int width, int height, int refresh)
    s_nHDMI_CurrentResolutionIndex = indexResolution;
    s_nHDMI_CurrentResolutionRefreshIndex = indexRefresh;
 
-   #if defined (HW_PLATFORM_RASPBERRY)
+   #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
    hardware_mount_boot();
    hardware_sleep_ms(50);
    hw_execute_bash_command("cp /boot/firmware/config.txt config.txt", NULL);
@@ -455,7 +455,7 @@ int hdmi_set_current_resolution(int width, int height, int refresh)
    hw_execute_bash_command("cp config.txt /boot/firmware/config.txt", NULL);
    #endif
 
-   #if defined (HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
    char szFile[MAX_FILE_PATH_SIZE];
    strcpy(szFile, FOLDER_CONFIG);
    strcat(szFile, "hdmi_mode.cfg");
