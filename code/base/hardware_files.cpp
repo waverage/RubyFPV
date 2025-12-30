@@ -136,7 +136,7 @@ void hardware_mount_root()
 void hardware_mount_boot()
 {
    #ifdef HW_PLATFORM_RASPBERRY
-   hw_execute_bash_command("sudo mount -o remount,rw /boot/firmware", NULL)
+   hw_execute_bash_command("sudo mount -o remount,rw /boot/firmware", NULL);
    #endif
 }
 
