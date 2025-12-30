@@ -6,10 +6,19 @@
 #include "hardware_procs.h"
 #include <errno.h>
 #include <unistd.h>
-#if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
+#if defined (HW_PLATFORM_RADXA)
 #include <linux/videodev2.h>
 #include <rockchip/rk_mpi.h>
 
+extern "C" {
+#include <drm.h>
+#include <xf86drm.h>
+#include <xf86drmMode.h>
+#include <drm_fourcc.h> 
+}
+#endif
+
+#if defined (HW_PLATFORM_RASPBERRY_PI5)
 extern "C" {
 #include <drm.h>
 #include <xf86drm.h>
