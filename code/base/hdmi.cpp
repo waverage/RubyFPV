@@ -152,7 +152,7 @@ int _hdmi_detect_current_mode()
 
    int fdDRM = -1;
 
-   fdDRM = open("/dev/dri/card0", O_RDWR | O_NONBLOCK);
+   fdDRM = open("/dev/dri/card1", O_RDWR | O_NONBLOCK);
    if ( fdDRM < 0 )
    {
       log_softerror_and_alarm("[HDMI] Failed to open graphics device.");

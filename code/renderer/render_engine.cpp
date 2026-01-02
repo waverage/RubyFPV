@@ -515,7 +515,7 @@ int RenderEngine::loadRawFont(int iFamilyId, const char* szFontFile, int iBold)
 
    log_line("[RenderEngineRaw] Loading font: %s", szFile);
    m_pRawFonts[m_iCountRawFonts]->pImageObject = _loadRawFontImageObject(szFile);
-   #if defined (HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
    #else
    if ( NULL == m_pRawFonts[m_iCountRawFonts]->pImageObject )
    {

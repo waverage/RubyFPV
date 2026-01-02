@@ -1,1 +1,3 @@
 console=serial0,115200 console=tty1 root=PARTUUID=89892a23-02 rootfstype=ext4 fsck.repair=yes noswap rootwait loglevel=3 logo.nologo plymouth.ignore-serial-consoles
+
+console=tty3 root=PARTUUID=89892a23-02 rootfstype=ext4 fsck.repair=yes noswap rootwait quiet loglevel=3 logo.nologo plymouth.ignore-serial-consoles consoleblank=0 vt.global_cursor_default=0 fbcon=map:2

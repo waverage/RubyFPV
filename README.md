@@ -71,3 +71,9 @@ If you are a hardware manufacturer and you want to add support in Ruby for your 
 ```
 blkid
 ```
+
+
+### check if ruby_central owns the display
+```
+cat /sys/kernel/debug/dri/1/clients
+```

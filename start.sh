@@ -6,6 +6,11 @@ echo "Mounting file systems..."
 
 #mount -o remount,rw /
 #mount -o remount,rw /boot
+
+echo "stop getty"
+
+systemctl stop getty@tty1.service
+
 echo "adding eth0 ip for debugging..."
 
 ip link set eth0 up

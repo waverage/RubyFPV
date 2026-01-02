@@ -166,7 +166,7 @@ int _ruby_drm_open_device()
    int iRet = -1;
    uint64_t cap;
 
-   s_fdDRM = open("/dev/dri/card0", O_RDWR | O_NONBLOCK);
+   s_fdDRM = open("/dev/dri/card1", O_RDWR | O_NONBLOCK);
    if ( s_fdDRM < 0 )
    {
       log_softerror_and_alarm("[DRMCore] Failed to open graphics device.");
@@ -434,9 +434,9 @@ int _ruby_drm_find_target_plane()
 
    for (int i = 0; i < s_DRMRuntimeState.pPlanesResources->count_planes; i++)
    {
-      if ( s_DRMRuntimeState.objInfoPlane.iObjIndex != -1 )
-      if ( s_DRMRuntimeState.objInfoPlane.iObjIndex != i )
-         continue;
+      //if ( s_DRMRuntimeState.objInfoPlane.iObjIndex != -1 )
+      //if ( s_DRMRuntimeState.objInfoPlane.iObjIndex != i )
+      //   continue;
 
       s_DRMRuntimeState.pPlane = drmModeGetPlane(s_fdDRM, s_DRMRuntimeState.pPlanesResources->planes[i]);
       if (!s_DRMRuntimeState.pPlane)
