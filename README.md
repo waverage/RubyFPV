@@ -77,3 +77,8 @@ blkid
 ```
 cat /sys/kernel/debug/dri/1/clients
 ```
+
+### show info about active DRM planes and their zpos value:
+```
+cat /sys/kernel/debug/dri/1/state
+```

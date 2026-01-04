@@ -204,7 +204,7 @@ void rx_video_output_start_video_streamer()
       strcat(szStreamerParams, szTmp);
    }
 
-   #if defined (HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
    char szCodec[32];
    szCodec[0] = 0;
    Model* pModel = NULL;
@@ -287,7 +287,7 @@ void rx_video_output_start_video_streamer()
       shared_mem_process_stats_close(SHARED_MEM_WATCHDOG_MPP_PLAYER, s_pSMProcessStatsMPPPlayer);
    s_pSMProcessStatsMPPPlayer = NULL;
 
-   #if defined(HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
    uTimeStart = g_TimeNow;
    while ( g_TimeNow < uTimeStart + 2000 )
    {
@@ -1413,7 +1413,7 @@ void rx_video_output_periodic_loop()
 {
    rx_video_recording_periodic_loop();
 
-   #if defined(HW_PLATFORM_RADXA)
+   #if defined (HW_PLATFORM_RADXA) || defined (HW_PLATFORM_RASPBERRY_PI5)
    _rx_video_output_watchdog_mpp_player();
    #endif
 

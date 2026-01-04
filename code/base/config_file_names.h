@@ -128,6 +128,11 @@
 #define FILE_FORCE_RESET "/boot/firmware/forcereset"
 #define FILE_BOOT_LOG_STEPS "/boot/firmware/bootstepslog.txt"
 
+#define VIDEO_PLAYER_PIPE "ruby_player_pi"
+#define VIDEO_PLAYER_SM "ruby_player_pi"
+#define VIDEO_PLAYER_UDP "ruby_player_pi"
+#define VIDEO_PLAYER_OFFLINE "ruby_player_pi"
+
 #else
 
 #define FOLDER_BOOT_FW "/boot"
@@ -139,6 +144,10 @@
 #define FILE_FORCE_RESET "/boot/forcereset"
 #define FILE_BOOT_LOG_STEPS "/boot/bootstepslog.txt"
 
+#define VIDEO_PLAYER_PIPE "ruby_player_p"
+#define VIDEO_PLAYER_SM "ruby_player_s"
+#define VIDEO_PLAYER_OFFLINE "ruby_player_f"
+
 #endif
 
 //#define VIDEO_RECORDER_COMMAND "raspivid"
@@ -149,10 +158,6 @@
 #define VIDEO_RECORDER_COMMAND_VEYE "./ruby_capture_veye"
 #define VIDEO_RECORDER_COMMAND_VEYE307 "./ruby_capture_veye"
 #define VIDEO_RECORDER_COMMAND_VEYE_SHORT_NAME "ruby_capture_veye"
-
-#define VIDEO_PLAYER_PIPE "ruby_player_p"
-#define VIDEO_PLAYER_SM "ruby_player_s"
-#define VIDEO_PLAYER_OFFLINE "ruby_player_f"
 
 #define VEYE_COMMANDS_FOLDER "/usr/local/share/veye-raspberrypi"
 #define VEYE_COMMANDS_FOLDER307 "/usr/local/share/veye-raspberrypi/307"

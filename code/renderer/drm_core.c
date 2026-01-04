@@ -489,13 +489,84 @@ int _ruby_drm_create_drm_surface_buffer(type_drm_buffer* pOutputBufferInfo)
    if ( NULL == pOutputBufferInfo )
       return -1;
 
+   if (s_DRMRuntimeState.uPlaneFormat == DRM_FORMAT_NV12) {
+      memset(pOutputBufferInfo, 0, sizeof(type_drm_buffer));
+      struct drm_mode_create_dumb creq;
+      struct drm_mode_destroy_dumb dreq;
+      struct drm_mode_map_dumb mreq;
+   
+      int iRet = 0;
+
+      memset(&creq, 0, sizeof(creq));
+      creq.width = s_DRMDisplayAttributes.iWidth;
+      creq.height = s_DRMDisplayAttributes.iHeight + (s_DRMDisplayAttributes.iHeight / 2); // Allocate 1.5x height for NV12
+      creq.bpp = 8;
+      iRet = drmIoctl(s_fdDRM, DRM_IOCTL_MODE_CREATE_DUMB, &creq);
+      if ( iRet < 0 )
+      {
+         log_softerror_and_alarm("[DRMCore] Cannot create buffer (%d)", errno);
+         return -errno;
+      }
+      pOutputBufferInfo->uWidth = s_DRMDisplayAttributes.iWidth;
+      pOutputBufferInfo->uHeight = s_DRMDisplayAttributes.iHeight;
+      pOutputBufferInfo->uStride = creq.pitch;
+      pOutputBufferInfo->uSize = creq.size;
+      pOutputBufferInfo->uHandle = creq.handle;
+
+      uint32_t handles[4] = {pOutputBufferInfo->uHandle, pOutputBufferInfo->uHandle, 0, 0};
+      uint32_t pitches[4] = {pOutputBufferInfo->uStride, pOutputBufferInfo->uStride, 0, 0};
+      uint32_t offsets[4] = {0, pOutputBufferInfo->uStride * s_DRMDisplayAttributes.iHeight, 0, 0};
+
+      iRet = drmModeAddFB2(s_fdDRM, s_DRMDisplayAttributes.iWidth, s_DRMDisplayAttributes.iHeight, s_DRMRuntimeState.uPlaneFormat,
+         handles, pitches, offsets, &(pOutputBufferInfo->uBufferId), 0);
+      if ( iRet )
+      {
+         log_softerror_and_alarm("[DRMCore] Cannot create framebuffer (%d)", errno);
+         memset(&dreq, 0, sizeof(dreq));
+         dreq.handle = pOutputBufferInfo->uHandle;
+         drmIoctl(s_fdDRM, DRM_IOCTL_MODE_DESTROY_DUMB, &dreq);
+         return -1;
+      }
+
+      memset(&mreq, 0, sizeof(mreq));
+      mreq.handle = pOutputBufferInfo->uHandle;
+      iRet = drmIoctl(s_fdDRM, DRM_IOCTL_MODE_MAP_DUMB, &mreq);
+      if ( iRet )
+      {
+         log_softerror_and_alarm("[DRMCore] Cannot map buffer (%d)", errno);
+         drmModeRmFB(s_fdDRM, pOutputBufferInfo->uBufferId); 
+         memset(&dreq, 0, sizeof(dreq));
+         dreq.handle = pOutputBufferInfo->uHandle;
+         drmIoctl(s_fdDRM, DRM_IOCTL_MODE_DESTROY_DUMB, &dreq);
+         return -1;
+      }
+
+      pOutputBufferInfo->pData = mmap(0, pOutputBufferInfo->uSize, PROT_READ | PROT_WRITE, MAP_SHARED,
+            s_fdDRM, mreq.offset);
+      if ( pOutputBufferInfo->pData == MAP_FAILED )
+      {
+         log_softerror_and_alarm("[DRMCore] Cannot mmap buffer (%d)", errno);
+         drmModeRmFB(s_fdDRM, pOutputBufferInfo->uBufferId); 
+         memset(&dreq, 0, sizeof(dreq));
+         dreq.handle = pOutputBufferInfo->uHandle;
+         drmIoctl(s_fdDRM, DRM_IOCTL_MODE_DESTROY_DUMB, &dreq);
+         return -1;
+      }
+
+      memset(pOutputBufferInfo->pData, 0, pOutputBufferInfo->uSize);
+   
+      log_line("[DRMCore] Created new surface buffer, size: %d, w/h: %d/%d, stride: %d, handle: %u, buffer id: %u",
+         pOutputBufferInfo->uSize, pOutputBufferInfo->uWidth, pOutputBufferInfo->uHeight,
+         pOutputBufferInfo->uStride, pOutputBufferInfo->uHandle, pOutputBufferInfo->uBufferId);
+      return 0;
+   }
+
    memset(pOutputBufferInfo, 0, sizeof(type_drm_buffer));
    struct drm_mode_create_dumb creq;
    struct drm_mode_destroy_dumb dreq;
    struct drm_mode_map_dumb mreq;
  
    int iRet = 0;
-   uint32_t handles[4] = {0}, pitches[4] = {0}, offsets[4] = {0};
 
    memset(&creq, 0, sizeof(creq));
    creq.width = s_DRMDisplayAttributes.iWidth;
@@ -513,10 +584,12 @@ int _ruby_drm_create_drm_surface_buffer(type_drm_buffer* pOutputBufferInfo)
    pOutputBufferInfo->uSize = creq.size;
    pOutputBufferInfo->uHandle = creq.handle;
 
+   uint32_t handles[4] = {0}, pitches[4] = {0}, offsets[4] = {0};
+
    handles[0] = pOutputBufferInfo->uHandle;
    pitches[0] = pOutputBufferInfo->uStride;
 
-   iRet = drmModeAddFB2(s_fdDRM, s_DRMDisplayAttributes.iWidth, s_DRMDisplayAttributes.iHeight, DRM_FORMAT_ARGB8888,
+   iRet = drmModeAddFB2(s_fdDRM, s_DRMDisplayAttributes.iWidth, s_DRMDisplayAttributes.iHeight, s_DRMRuntimeState.uPlaneFormat,
        handles, pitches, offsets, &(pOutputBufferInfo->uBufferId), 0);
    if ( iRet )
    {
@@ -711,7 +784,12 @@ int ruby_drm_core_init(int iPlaneIndex, uint32_t uFormat, int iWidth, int iHeigh
    s_DRMDisplayAttributes.iHeight = iHeight;
    s_DRMDisplayAttributes.iRefreshRate = iRefreshRate;
    s_DRMDisplayAttributes.iInterleaved = 0;
-   s_DRMDisplayAttributes.iBPP = 32;
+   
+   if (uFormat == DRM_FORMAT_NV12) {
+      s_DRMDisplayAttributes.iBPP = 8;
+   } else {
+      s_DRMDisplayAttributes.iBPP = 32;
+   }
 
    memset(&s_DRMRuntimeState, 0, sizeof(type_drm_runtime_state));
    s_DRMRuntimeState.uPlaneFormat = uFormat;
@@ -852,32 +930,11 @@ int ruby_drm_swap_mainback_buffers()
    ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "FB_ID", s_DRMRuntimeState.drawBuffers[s_DRMRuntimeState.iActiveOnScreenDrawBuffer].uBufferId );
 
    int iRet = drmModeAtomicCommit(s_fdDRM, s_DRMRuntimeState.pAtomicRequest, DRM_MODE_ATOMIC_ALLOW_MODESET, NULL);
-   return iRet;
+    if (iRet < 0) {
+     log_softerror_and_alarm("[DRMCore] Failed to commit drm! %d, errno: %d", iRet, errno);
+   }
 
-   //if ( (0 == s_iDRMTargetPlaneIndex) || (-1 == s_iDRMTargetPlaneIndex) )
-   {
-      /*
-      int iRet = drmModeSetCrtc(s_fdDRM, s_DRMRuntimeState.objInfoCRTc.uObjId, s_DRMRuntimeState.drawBuffers[s_DRMRuntimeState.iActiveOnScreenDrawBuffer].uBufferId, 0, 0,
-         &s_DRMRuntimeState.objInfoConnector.uObjId, 1, &s_DRMRuntimeState.targetModeInfo);
-      if ( iRet < 0 )
-      {
-         log_softerror_and_alarm("[DRMCore] Failed to set new mode.");
-         return;
-      }
-      */
-   }
-   /*
-   else
-   {
-      drmModeSetPlane( s_fdDRM, (u32)s_iDRMPlaneId, s_uDRMCurrentCrtcId,
-                    s_DRMDrawBuffers[s_iDRMActiveOnScreenDrawBuffer].uBufferId,
-                    0,
-                    0, 0,
-                    s_DRMDisplayAttributes.iWidth, s_DRMDisplayAttributes.iHeight,
-                    0, 0,
-                    ((uint16_t) s_DRMDisplayAttributes.iWidth) << 16, ((uint16_t) s_DRMDisplayAttributes.iHeight) << 16);
-   }
-   */
+   return iRet;
 }
 
 
@@ -968,7 +1025,7 @@ int ruby_drm_core_set_plane_properties_and_buffer(uint32_t uBufferId)
    ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "SRC_X", 0 );
    ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "SRC_Y", 0 );
    ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "SRC_W", uSrcWidth<<16 );
-   ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "SRC_H", uSrcHeight<<16 );
+   ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "SRC_H", (uint64_t)uSrcHeight<<16 );
 
    ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "zpos", zPos );
 

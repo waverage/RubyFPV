@@ -38,7 +38,7 @@
 // Configuration customisations for individual hardware platforms: 
 
 #ifdef HW_PLATFORM_RASPBERRY
-#define HW_CAPABILITY_GPIO
+//#define HW_CAPABILITY_GPIO // disabled because gpio doesn't work on pi5 (need to rewrite code)
 #define HW_CAPABILITY_I2C
 #define HW_CAPABILITY_IONICE
 #endif

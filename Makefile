@@ -41,7 +41,7 @@ ifeq ($(RUBY_BUILD_ENV),pi5)
 LDFLAGS_CENTRAL := -L/lib/aarch64-linux-gnu -lpthread -lrt -lm
 LDFLAGS_CENTRAL2 := -lpthread -lrt -lm
 
-LDFLAGS_RENDERER := -ldrm -lcairo
+LDFLAGS_RENDERER := -ldrm -lcairo -lavcodec -lavutil -lswscale
 CFLAGS_RENDERER := -I/usr/include/drm -I/usr/include/libdrm
 CFLAGS_RENDERER += `pkg-config cairo --cflags`
 _LDFLAGS := $(LDFLAGS) -lrt -lpcap -lpthread -li2c -lgpiod -lwiringPi -Wl,--gc-sections 
@@ -120,7 +120,7 @@ $(FOLDER_RUTILS)/%.o: $(FOLDER_RUTILS)/%.c
 	$(CC) $(_CFLAGS) -c -o $@ $<
 
 $(FOLDER_RUTILS)/%.o: $(FOLDER_RUTILS)/%.cpp
-	$(CXX) $(_CPPFLAGS) -c -o $@ $<
+	$(CXX) $(_CPPFLAGS) $(CFLAGS_RENDERER) -c -o $@ $<
 
 $(FOLDER_UTILS)/%.o: $(FOLDER_UTILS)/%.c
 	$(CC) $(_CFLAGS) -c -o $@ $<
@@ -238,7 +238,11 @@ vehicle: ruby_start ruby_utils ruby_tx_telemetry ruby_rt_vehicle
 ifeq ($(RUBY_BUILD_ENV),radxa)
 station: ruby_start ruby_utils ruby_controller ruby_rt_station ruby_tx_rc ruby_rx_telemetry ruby_player_radxa
 else
+ifeq ($(RUBY_BUILD_ENV),pi5)
+station: ruby_start ruby_utils ruby_controller ruby_rt_station ruby_tx_rc ruby_rx_telemetry ruby_player_pi
+else
 station: ruby_start ruby_utils ruby_controller ruby_rt_station ruby_tx_rc ruby_rx_telemetry
+endif
 endif
 
 ruby_central: $(FOLDER_CENTRAL)/ruby_central.o $(MODULE_BASE) $(MODULE_MODELS) $(MODULE_COMMON) $(MODULE_BASE2) $(CENTRAL_MENU_ITEMS_ALL) $(CENTRAL_MENU_ALL1) $(CENTRAL_RENDER_CODE) $(CENTRAL_MENU_ALL2) $(CENTRAL_MENU_ALL3) $(CENTRAL_MENU_ALL4) $(CENTRAL_MENU_ALL5) $(CENTRAL_MENU_ALL6) $(CENTRAL_MENU_RC)  $(CENTRAL_MENU_RADIO) $(CENTRAL_POPUP_ALL) $(CENTRAL_RENDER_ALL) $(CENTRAL_OSD_ALL) $(CENTRAL_OLED_ALL) $(CENTRAL_ALL) $(CENTRAL_RADIO) $(FOLDER_BASE)/shared_mem_controller_only.o $(FOLDER_BASE)/hdmi.o $(FOLDER_COMMON)/favorites.o $(FOLDER_BASE)/plugins_settings.o \
@@ -319,6 +323,9 @@ ruby_plugin_gauge_heading: $(FOLDER_PLUGINS_OSD)/ruby_plugin_gauge_heading.o osd
 
 ruby_player_radxa:code/r_player/ruby_player_radxa.o code/r_player/mpp_core.o $(FOLDER_BASE)/hdmi.o $(FOLDER_BASE)/ctrl_settings.o $(FOLDER_BASE)/shared_mem.o $(FOLDER_BASE)/parser_h264.o $(CENTRAL_RENDER_CODE) $(MODULE_MINIMUM_BASE) $(MODULE_MINIMUM_COMMON)
 	$(CXX) $(_CPPFLAGS) $(CFLAGS_RENDERER) -o $@ $^ $(_LDFLAGS) $(LDFLAGS_RENDERER) $(LDFLAGS_CENTRAL) $(LDFLAGS_CENTRAL2) -ldl -lc -lrockchip_mpp
+
+ruby_player_pi:code/r_utils/ruby_player_pi.o $(FOLDER_BASE)/hdmi.o $(FOLDER_BASE)/ctrl_settings.o $(FOLDER_BASE)/shared_mem.o $(FOLDER_BASE)/parser_h264.o $(CENTRAL_RENDER_CODE) $(MODULE_MINIMUM_BASE) $(MODULE_MINIMUM_COMMON)
+	$(CXX) $(_CPPFLAGS) $(CFLAGS_RENDERER) -o $@ $^ $(_LDFLAGS) $(LDFLAGS_RENDERER) $(LDFLAGS_CENTRAL) $(LDFLAGS_CENTRAL2) -ldl -lc
 
 ifeq ($(RUBY_BUILD_ENV),radxa)
 tests: test_port_rx test_port_tx test_link

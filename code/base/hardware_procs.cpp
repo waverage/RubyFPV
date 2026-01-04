@@ -414,10 +414,13 @@ void hw_log_processes(int argc, char *argv[])
          _enum_process("ruby_rx_telemetry", iCore);
          _enum_process("ruby_tx_rc", iCore);
          _enum_process("ruby_i2c", iCore);
-         #if defined (HW_PLATFORM_RASPBERRY)
+         #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
          _enum_process("ruby_player_s", iCore);
          _enum_process("ruby_player_f", iCore);
          _enum_process("ruby_player_p", iCore);
+         #endif
+         #if defined (HW_PLATFORM_RASPBERRY_PI5)
+         _enum_process("ruby_player_pi", iCore);
          #endif
          #if defined (HW_PLATFORM_RADXA)
          _enum_process("ruby_player_radxa", iCore);

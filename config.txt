@@ -14,7 +14,7 @@ avoid_warnings=2
 
 # Overclocking for Pi 5 (Stable / Moderate)
 # Note: 900MHz (your Pi4 setting) would be a massive underclock for Pi 5.
-#arm_freq=2600
+#arm_freq=1200
 #gpu_freq=900
 #over_voltage_delta=50000
 
@@ -44,4 +44,7 @@ display_auto_detect=1
 # --- Video Driver ---
 # Pi 5 does NOT support fkms. You MUST use kms.
 [all]
-dtoverlay=vc4-kms-v3d
+dtoverlay=vc4-kms-v3d,cma-512
+usb_max_current_enable=1
+# Force HDMI 0 to 1080p
+#video=HDMI-A-1:1920x1080M@60
