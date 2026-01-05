@@ -324,7 +324,7 @@ ruby_plugin_gauge_heading: $(FOLDER_PLUGINS_OSD)/ruby_plugin_gauge_heading.o osd
 ruby_player_radxa:code/r_player/ruby_player_radxa.o code/r_player/mpp_core.o $(FOLDER_BASE)/hdmi.o $(FOLDER_BASE)/ctrl_settings.o $(FOLDER_BASE)/shared_mem.o $(FOLDER_BASE)/parser_h264.o $(CENTRAL_RENDER_CODE) $(MODULE_MINIMUM_BASE) $(MODULE_MINIMUM_COMMON)
 	$(CXX) $(_CPPFLAGS) $(CFLAGS_RENDERER) -o $@ $^ $(_LDFLAGS) $(LDFLAGS_RENDERER) $(LDFLAGS_CENTRAL) $(LDFLAGS_CENTRAL2) -ldl -lc -lrockchip_mpp
 
-ruby_player_pi:code/r_utils/ruby_player_pi.o $(FOLDER_BASE)/hdmi.o $(FOLDER_BASE)/ctrl_settings.o $(FOLDER_BASE)/shared_mem.o $(FOLDER_BASE)/parser_h264.o $(CENTRAL_RENDER_CODE) $(MODULE_MINIMUM_BASE) $(MODULE_MINIMUM_COMMON)
+ruby_player_pi:code/r_utils/ruby_player_pi.o $(FOLDER_BASE)/hdmi.o $(FOLDER_BASE)/ctrl_settings.o $(FOLDER_BASE)/shared_mem.o $(FOLDER_STATION)/shared_vars.o $(FOLDER_BASE)/parser_h264.o $(CENTRAL_RENDER_CODE) $(MODULE_MINIMUM_BASE) $(MODULE_MINIMUM_COMMON)
 	$(CXX) $(_CPPFLAGS) $(CFLAGS_RENDERER) -o $@ $^ $(_LDFLAGS) $(LDFLAGS_RENDERER) $(LDFLAGS_CENTRAL) $(LDFLAGS_CENTRAL2) -ldl -lc
 
 ifeq ($(RUBY_BUILD_ENV),radxa)

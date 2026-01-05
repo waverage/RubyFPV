@@ -34,6 +34,8 @@
 #include "../renderer/drm_core.h"
 #include <ctype.h>
 #include <sys/ioctl.h>
+#include "../base/shared_mem.h"
+#include "../r_station/shared_vars.h"
 
 #ifndef HW_PLATFORM_RASPBERRY_PI5
 #error "ONLY FOR PI5 PLATFORM!"
@@ -53,7 +55,7 @@ extern "C" {
 }
 
 
-bool g_bQuit = false;
+//bool g_bQuit = false;
 bool g_bDebug = false;
 bool g_bPlayFile = false;
 bool g_bPlayingIntro = false;
@@ -63,6 +65,8 @@ bool g_bPlayStreamUDP = false;
 bool g_bPlayStreamSM = false;
 bool g_bInitUILayerToo = false;
 bool g_bUseH265Decoder = false;
+
+int g_drm_fd = -1;
 
 char g_szPlayFileName[MAX_FILE_PATH_SIZE];
 int g_iFileFPS = 30;
@@ -301,11 +305,11 @@ void _do_stream_mode_pipe() {
    int iHDMIIndex = hdmi_load_current_mode();
    if ( iHDMIIndex < 0 )
       iHDMIIndex = hdmi_get_best_resolution_index_for(DEFAULT_RADXA_DISPLAY_WIDTH, DEFAULT_RADXA_DISPLAY_HEIGHT, DEFAULT_RADXA_DISPLAY_REFRESH);
-   log_line("[PLAYER] HDMI mode to use: %d (%d x %d @ %d)", iHDMIIndex, hdmi_get_current_resolution_width(), hdmi_get_current_resolution_height(), hdmi_get_current_resolution_refresh() );
-
+   
    int w = hdmi_get_current_resolution_width();
    int h = hdmi_get_current_resolution_height();
    int r = hdmi_get_current_resolution_refresh();
+   log_line("[PLAYER] HDMI mode to use: %d (%d x %d @ %d)", iHDMIIndex,  w, h, r);
 
    if (g_bInitUILayerToo) {
       log_line("[PLAYER] Init display UI layer too...");
@@ -444,15 +448,20 @@ void _do_player_mode()
       _signal_play_file_finished();
       return;
    }
+
    int iHDMIIndex = hdmi_load_current_mode();
    if ( iHDMIIndex < 0 )
       iHDMIIndex = hdmi_get_best_resolution_index_for(DEFAULT_RADXA_DISPLAY_WIDTH, DEFAULT_RADXA_DISPLAY_HEIGHT, DEFAULT_RADXA_DISPLAY_REFRESH);
-   log_line("[PLAYER] HDMI mode to use: %d (%d x %d @ %d)", iHDMIIndex, hdmi_get_current_resolution_width(), hdmi_get_current_resolution_height(), hdmi_get_current_resolution_refresh() );
+   
+   int w = hdmi_get_current_resolution_width();
+   int h = hdmi_get_current_resolution_height();
+   int r = hdmi_get_current_resolution_refresh();
+   log_line("[PLAYER] HDMI mode to use: %d (%d x %d @ %d)", iHDMIIndex,  w, h, r);
 
    if ( g_bInitUILayerToo )
    {
       log_line("[PLAYER] Init display UI layer too...");
-      ruby_drm_core_init(0, DRM_FORMAT_ARGB8888,  hdmi_get_current_resolution_width(), hdmi_get_current_resolution_height(), hdmi_get_current_resolution_refresh());
+      ruby_drm_core_init(0, DRM_FORMAT_ARGB8888,  w, h, r);
       //ruby_drm_swap_mainback_buffers();
       ruby_drm_core_set_plane_properties_and_buffer(ruby_drm_core_get_main_draw_buffer_id());
 
@@ -460,7 +469,8 @@ void _do_player_mode()
    }
 
    log_line("[PLAYER] Init display video layer...");
-   ruby_drm_core_init(1, DRM_FORMAT_NV12, hdmi_get_current_resolution_width(), hdmi_get_current_resolution_height(), hdmi_get_current_resolution_refresh());
+   // Init on a "overlay" plane here
+   ruby_drm_core_init(1, DRM_FORMAT_NV12, w, h, r);
    log_line("[PLAYER] Done init display video layer.");
 
    // 2. Init Pi 5 Decoder
@@ -553,6 +563,12 @@ void _do_player_mode()
       }
    }
 
+   _signal_play_file_will_finish();
+   av_frame_free(&g_pFrame);
+   av_packet_free(&g_pPacket);
+   avcodec_free_context(&g_pCodecCtx);
+   ruby_drm_core_uninit();
+   _signal_play_file_finished();
    free(file_buffer);
 }
 
@@ -593,6 +609,7 @@ int main(int argc, char *argv[])
       printf("-m [wxh@r] sets a custom video mode\n");
       printf("-b playing intro\n");
       printf("-i init UI layer too when playing stream or files\n");
+      printf("-drmfd Pass DRM file descriptor\n");
       printf("-d debug output to stdout\n\n");
       return 0;
    }
@@ -673,6 +690,16 @@ int main(int argc, char *argv[])
          }
          continue;
       }
+
+      if ( 0 == strcmp(argv[iParam], "-drmfd") )
+      {
+         g_drm_fd = atoi(argv[iParam+1]);
+         iParam++;
+         log_line("[PLAYER] Got -drmfd %d", g_drm_fd);
+         ruby_drm_core_set_fd(g_drm_fd);
+         continue;
+      }
+
       iParam++;
    }
    while (iParam < argc);
@@ -750,6 +777,12 @@ int main(int argc, char *argv[])
    else
       log_line("Opened shared mem for process watchdog for writing (%s).", SHARED_MEM_WATCHDOG_MPP_PLAYER);
  
+   g_pProcessStatsCentral = shared_mem_process_stats_open_write(SHARED_MEM_WATCHDOG_CENTRAL);
+   if ( NULL == g_pProcessStatsCentral )
+      log_softerror_and_alarm("Failed to open shared mem for ruby_central process watchdog for writing: %s", SHARED_MEM_WATCHDOG_CENTRAL);
+   else
+      log_line("Opened shared mem for ruby_centrall process watchdog for writing.");
+
    if ( g_bPlayFile )
       log_line("Running mode: play file: [%s] [%d FPS] [exit on end: %s] [playing intro: %s]", g_szPlayFileName, g_iFileFPS, g_bExitOnEnd?"yes":"no", g_bPlayingIntro?"yes":"no");
    if ( g_bPlayStreamPipe )
@@ -765,6 +798,7 @@ int main(int argc, char *argv[])
    {
       log_softerror_and_alarm("Invalid params, no mode specified. Exit.");
       shared_mem_process_stats_close(SHARED_MEM_WATCHDOG_MPP_PLAYER, g_pSMProcessStats);
+      shared_mem_process_stats_close(SHARED_MEM_WATCHDOG_CENTRAL, g_pProcessStatsCentral);
       return 0;
    }
    else if ( g_bPlayFile )
@@ -778,6 +812,7 @@ int main(int argc, char *argv[])
 
    log_line("Cleaning up on exit...");
    shared_mem_process_stats_close(SHARED_MEM_WATCHDOG_MPP_PLAYER, g_pSMProcessStats);
+   shared_mem_process_stats_close(SHARED_MEM_WATCHDOG_CENTRAL, g_pProcessStatsCentral);
    log_line("Will exit now");
    return 0;
 }

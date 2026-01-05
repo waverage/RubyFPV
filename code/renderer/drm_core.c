@@ -166,6 +166,11 @@ int _ruby_drm_open_device()
    int iRet = -1;
    uint64_t cap;
 
+   if (s_fdDRM != -1) {
+      log_line("[DRMCore] DRM device already opened.");
+      return 0;
+   }
+
    s_fdDRM = open("/dev/dri/card1", O_RDWR | O_NONBLOCK);
    if ( s_fdDRM < 0 )
    {
@@ -397,6 +402,23 @@ int _ruby_drm_core_enumerate_find_resources()
    return 0;
 }
 
+uint64_t get_plane_type(uint32_t plane_id) {
+    uint64_t plane_type = -1;
+    drmModeObjectPropertiesPtr props = drmModeObjectGetProperties(s_fdDRM, plane_id, DRM_MODE_OBJECT_PLANE);
+
+    for (uint32_t i = 0; i < props->count_props; i++) {
+        drmModePropertyPtr prop = drmModeGetProperty(s_fdDRM, props->props[i]);
+        if (prop && strcmp(prop->name, "type") == 0) {
+            plane_type = props->prop_values[i];
+            drmModeFreeProperty(prop);
+            break;
+        }
+        if (prop) drmModeFreeProperty(prop);
+    }
+    drmModeFreeObjectProperties(props);
+    return plane_type;
+}
+
 int _ruby_drm_find_target_plane()
 {
    // -------------------------------------------------------------------
@@ -405,6 +427,14 @@ int _ruby_drm_find_target_plane()
 
    log_line("[DRMCore] Finding planes supported by current display (target plane index is %d, target plane format is: %s)...",
       s_DRMRuntimeState.objInfoPlane.iObjIndex, _ruby_drm_fourcc_to_string(s_DRMRuntimeState.uPlaneFormat) );
+
+   int planeType = s_DRMRuntimeState.objInfoPlane.iObjIndex;
+
+   if (planeType == 0) {
+      log_line("[DRMCore] Looking for primary plane");
+   } else {
+      log_line("[DRMCore] Looking for overlay plane");
+   }
 
    s_DRMRuntimeState.pPlanesResources = drmModeGetPlaneResources(s_fdDRM);
    if ( !s_DRMRuntimeState.pPlanesResources )
@@ -445,25 +475,40 @@ int _ruby_drm_find_target_plane()
          continue;
       }
 
-      if ( s_DRMRuntimeState.pPlane->possible_crtcs & (1 << s_DRMRuntimeState.objInfoCRTc.iObjIndex) )
+      if ( !(s_DRMRuntimeState.pPlane->possible_crtcs & (1 << s_DRMRuntimeState.objInfoCRTc.iObjIndex)) )
       {
-         log_line("[DRMCore] Plane index %d (plane id %u) supports %d formats on current crt/display",
+         log_line("[DRMCore] Skipping plane index %d as it's not supported by currently used crtc index %d", i, s_DRMRuntimeState.objInfoCRTc.iObjIndex);
+         continue;
+      }
+
+      log_line("[DRMCore] Plane index %d (plane id %u) supports %d formats on current crt/display",
             i, s_DRMRuntimeState.pPlanesResources->planes[i], s_DRMRuntimeState.pPlane->count_formats);
-         for (int j=0; j<s_DRMRuntimeState.pPlane->count_formats; j++)
+
+      uint64_t type = get_plane_type(s_DRMRuntimeState.pPlanesResources->planes[i]);
+
+      log_line("[DRMCore] plane[%d] has type: %d", i, type);
+
+      if (planeType == 0 && type != 1) {
+         log_line("[DRMCore] Skipping plane index %d as it has wrong type: %d", i, type);
+         continue;
+      }
+      if (planeType == 1 && type != 0) {
+         log_line("[DRMCore] Skipping plane index %d as it has wrong type: %d", i, type);
+         continue;
+      }
+
+      for (int j=0; j<s_DRMRuntimeState.pPlane->count_formats; j++)
+      {
+         log_line("[DRMCore] Found plane-%d format %d: %s",
+            i, j, _ruby_drm_fourcc_to_string(s_DRMRuntimeState.pPlane->formats[j]));
+         if ( s_DRMRuntimeState.pPlane->formats[j] == s_DRMRuntimeState.uPlaneFormat )
          {
-            log_line("[DRMCore] Found plane-%d format %d: %s",
-             i, j, _ruby_drm_fourcc_to_string(s_DRMRuntimeState.pPlane->formats[j]));
-            if ( s_DRMRuntimeState.pPlane->formats[j] == s_DRMRuntimeState.uPlaneFormat )
-            {
-               s_DRMRuntimeState.objInfoPlane.uObjId = s_DRMRuntimeState.pPlanesResources->planes[i];
-               s_DRMRuntimeState.objInfoPlane.iObjIndex = i;
-               s_DRMRuntimeState.iPlaneFormatIndex = j;
-               break;
-            }
+            s_DRMRuntimeState.objInfoPlane.uObjId = s_DRMRuntimeState.pPlanesResources->planes[i];
+            s_DRMRuntimeState.objInfoPlane.iObjIndex = i;
+            s_DRMRuntimeState.iPlaneFormatIndex = j;
+            break;
          }
       }
-      else
-         log_line("[DRMCore] Skipping plane index %d as it's not supported by currently used crtc index %d", i, s_DRMRuntimeState.objInfoCRTc.iObjIndex);
 
       if ( s_DRMRuntimeState.objInfoPlane.uObjId != 0xFFFFFFFF )
          break;
@@ -895,6 +940,11 @@ int ruby_drm_core_uninit()
 int ruby_drm_core_get_fd()
 {
    return s_fdDRM;
+}
+
+void ruby_drm_core_set_fd(int drm_fd)
+{
+   s_fdDRM = drm_fd;
 }
 
 type_drm_display_attributes* ruby_drm_get_main_display_info()
