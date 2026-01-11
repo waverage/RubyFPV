@@ -70,7 +70,7 @@ typedef struct
    u32 uTotalLoopTime;
    u32 uAverageLoopTimeMs;
    u32 uMaxLoopTimeMs;
-   uint32_t drmMagicToken;
+   int drmFd;
 } ALIGN_STRUCT_SPEC_INFO shared_mem_process_stats;
 
 

@@ -502,7 +502,7 @@ void MenuVehicleVideo::sendVideoSettings()
       paramsNew.uVideoExtraFlags &= ~VIDEO_FLAG_GENERATE_H265;
    else
    {
-      #if defined (HW_PLATFORM_RASPBERRY)
+      #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
       addMessage(L("Your controller Raspberry Pi hardware supports only H264 video decoder. Can't use H265 codec."));
       valuesToUI();
       return;

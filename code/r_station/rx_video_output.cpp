@@ -235,6 +235,11 @@ void rx_video_output_start_video_streamer()
       strcat(szStreamerParams, "-sm");
    #endif
 
+   // if ( 0 != szStreamerParams[0] )
+   //    strcat(szStreamerParams, " ");
+   // sprintf(szTmp, "-drmfd %d", ruby_drm_core_get_fd());
+   // strcat(szStreamerParams, szTmp);
+
    if ( 0 != szStreamerParams[0] )
       strcat(szStreamerParams, " ");
    strcat(szStreamerParams, "2>&1 1>/dev/null");

@@ -411,7 +411,7 @@ bool _render_video_background()
       if ( (NULL != pModel) && (pModel->iCameraCount <= 0) )
          bVehicleHasCamera = false;
 
-      #if defined (HW_PLATFORM_RASPBERRY)
+      #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
       if ( (NULL != pModel) && (pModel->video_params.uVideoExtraFlags & VIDEO_FLAG_GENERATE_H265) )
          bCantDisplayVideo = true;
       #endif
@@ -551,7 +551,7 @@ void render_background_and_paddings(bool bForceBackground)
 
    Model* pActiveModel = osd_get_current_data_source_vehicle_model();
    u32 uActiveVehicleId = osd_get_current_data_source_vehicle_id();
-   #if defined (HW_PLATFORM_RASPBERRY)
+   #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
    if ( (NULL != pActiveModel) && (pActiveModel->video_params.uVideoExtraFlags & VIDEO_FLAG_GENERATE_H265) )
    {
       bShowBgPicture = false;
@@ -2729,6 +2729,15 @@ int main(int argc, char *argv[])
    }
 
    s_uTimeToSwitchLogLevel = get_current_timestamp_ms() + 10000;
+
+   clear_shared_mems();   
+   ruby_clear_all_ipc_channels();
+
+   g_pProcessStatsCentral = shared_mem_process_stats_open_write(SHARED_MEM_WATCHDOG_CENTRAL);
+   if ( NULL == g_pProcessStatsCentral )
+      log_softerror_and_alarm("Failed to open shared mem for ruby_central process watchdog for writing: %s", SHARED_MEM_WATCHDOG_CENTRAL);
+   else
+      log_line("Opened shared mem for ruby_centrall process watchdog for writing.");
    
    #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
    hdmi_enum_modes();
@@ -2744,16 +2753,9 @@ int main(int argc, char *argv[])
    ruby_drm_core_init(0, DRM_FORMAT_ARGB8888, hdmi_get_current_resolution_width(), hdmi_get_current_resolution_height(), hdmi_get_current_resolution_refresh());
    ruby_drm_core_set_plane_properties_and_buffer(ruby_drm_core_get_main_draw_buffer_id());
    ruby_drm_enable_vsync(g_pControllerSettings->iHDMIVSync);
+   g_pProcessStatsCentral->drmFd = ruby_drm_core_get_fd();
+   log_line("set g_pProcessStatsCentral->drmFd = %d", ruby_drm_core_get_fd());
    #endif
-
-   clear_shared_mems();   
-   ruby_clear_all_ipc_channels();
-
-   g_pProcessStatsCentral = shared_mem_process_stats_open_write(SHARED_MEM_WATCHDOG_CENTRAL);
-   if ( NULL == g_pProcessStatsCentral )
-      log_softerror_and_alarm("Failed to open shared mem for ruby_central process watchdog for writing: %s", SHARED_MEM_WATCHDOG_CENTRAL);
-   else
-      log_line("Opened shared mem for ruby_centrall process watchdog for writing.");
 
    g_pRenderEngine = render_init_engine();
    log_line("Render Engine was initialized.");
@@ -2801,7 +2803,8 @@ int main(int argc, char *argv[])
             is_semaphore_signaled_clear(s_pSemaphoreVideoIntro, SEMAPHORE_VIDEO_FILE_PLAYBACK_FINISHED);
             g_bPlayIntroWillEnd = false;
             char szComm[256];
-            sprintf(szComm, "./%s -file res/intro.h264 -fps 15 -drmfd %d -endexit&", VIDEO_PLAYER_OFFLINE, ruby_drm_core_get_fd());
+            sprintf(szComm, "./%s -file res/intro.h264 -fps 15 -endexit&", VIDEO_PLAYER_OFFLINE);
+            // sprintf(szComm, "./%s -file res/intro.h264 -fps 15 -drmfd %d -endexit&", VIDEO_PLAYER_OFFLINE, ruby_drm_core_get_fd());
             hw_execute_bash_command_nonblock(szComm, NULL);
             hardware_sleep_ms(500);
             hardware_sleep_ms(500);
@@ -2989,6 +2992,8 @@ void ruby_reinit_hdmi_display()
    ruby_drm_core_init(0, DRM_FORMAT_ARGB8888, hdmi_get_current_resolution_width(), hdmi_get_current_resolution_height(), hdmi_get_current_resolution_refresh());
    ruby_drm_core_set_plane_properties_and_buffer(ruby_drm_core_get_main_draw_buffer_id());
    ruby_drm_enable_vsync(g_pControllerSettings->iHDMIVSync);
+   g_pProcessStatsCentral->drmFd = ruby_drm_core_get_fd();
+   log_line("set g_pProcessStatsCentral->drmFd = %d", ruby_drm_core_get_fd());
    #endif
 
    g_pRenderEngine = render_init_engine();

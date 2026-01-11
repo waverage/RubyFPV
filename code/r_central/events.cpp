@@ -810,7 +810,7 @@ bool _onEventCheckNewlyPairedModelForUIActionsToTake()
       return true;
    }
 
-   #if defined(HW_PLATFORM_RASPBERRY)
+   #if defined (HW_PLATFORM_RASPBERRY) && !defined (HW_PLATFORM_RASPBERRY_PI5)
    if ( s_pEventsLastRecvModelSettings->video_params.uVideoExtraFlags & VIDEO_FLAG_GENERATE_H265 )
    if ( ! s_bEventTookPairingUIActionEncoderType )
    {

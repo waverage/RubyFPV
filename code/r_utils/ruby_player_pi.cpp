@@ -777,7 +777,7 @@ int main(int argc, char *argv[])
    else
       log_line("Opened shared mem for process watchdog for writing (%s).", SHARED_MEM_WATCHDOG_MPP_PLAYER);
  
-   g_pProcessStatsCentral = shared_mem_process_stats_open_write(SHARED_MEM_WATCHDOG_CENTRAL);
+   g_pProcessStatsCentral = shared_mem_process_stats_open_read(SHARED_MEM_WATCHDOG_CENTRAL);
    if ( NULL == g_pProcessStatsCentral )
       log_softerror_and_alarm("Failed to open shared mem for ruby_central process watchdog for writing: %s", SHARED_MEM_WATCHDOG_CENTRAL);
    else
@@ -793,6 +793,11 @@ int main(int argc, char *argv[])
       log_line("Running mode: stream from sharedmem");
    if ( 0 != g_iCustomWidth )
       log_line("Set custom video mode: %dx%d@%d", g_iCustomWidth, g_iCustomHeight, g_iCustomRefresh);
+
+   if (g_pProcessStatsCentral->drmFd > 0) {
+      log_line("[PLAYER] Got -drmfd %d from shared mem", g_pProcessStatsCentral->drmFd);
+      ruby_drm_core_set_fd(g_pProcessStatsCentral->drmFd);
+   }
 
    if ( (!g_bPlayFile) && (!g_bPlayStreamPipe) && (!g_bPlayStreamUDP) && (!g_bPlayStreamSM) )
    {

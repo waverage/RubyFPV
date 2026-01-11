@@ -429,6 +429,11 @@ int _ruby_drm_find_target_plane()
       s_DRMRuntimeState.objInfoPlane.iObjIndex, _ruby_drm_fourcc_to_string(s_DRMRuntimeState.uPlaneFormat) );
 
    int planeType = s_DRMRuntimeState.objInfoPlane.iObjIndex;
+   if (planeType == 0) {
+      planeType = 1;
+   } else {
+      planeType = 0;
+   }
 
    if (planeType == 0) {
       log_line("[DRMCore] Looking for primary plane");
@@ -998,10 +1003,14 @@ int ruby_drm_core_set_plane_properties_and_buffer(uint32_t uBufferId)
    uint64_t uCrtY = 0;
    uint64_t uCrtW = uSrcWidth;
    uint64_t uCrtH = uSrcHeight;
-   if ( s_DRMRuntimeState.objInfoPlane.iObjIndex == 0 )
+   if ( s_DRMRuntimeState.objInfoPlane.iObjIndex == 2 )
    {
       // OSD plane
       zPos = 4;
+
+      // Set UI Plane (81) to full global alpha to enable blending
+      // 0xFFFF is fully opaque, but allows the per-pixel alpha of ARGB8888 to work.
+      ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "alpha", 0xFFFF);
    }
    else
    {
@@ -1078,6 +1087,7 @@ int ruby_drm_core_set_plane_properties_and_buffer(uint32_t uBufferId)
    ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "SRC_H", (uint64_t)uSrcHeight<<16 );
 
    ruby_drm_set_object_property(&s_DRMRuntimeState.objInfoPlane, "zpos", zPos );
+
 
    int iRet = drmModeAtomicCommit(s_fdDRM, s_DRMRuntimeState.pAtomicRequest, DRM_MODE_ATOMIC_ALLOW_MODESET, NULL);
 
